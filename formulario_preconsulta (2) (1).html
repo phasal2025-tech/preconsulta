@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulario Pre-Consulta — Neurología &amp; Salud Mental</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#1a1a18;min-height:100vh;padding:1.5rem 1rem}
+.app{max-width:680px;margin:0 auto}
+.app-header{background:#1a3a5c;color:white;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+.app-header h1{font-size:1.2rem;font-weight:500;margin-bottom:4px}
+.app-header p{font-size:12px;opacity:.7}
+.prog-wrap{margin-bottom:1.25rem}
+.prog-label{font-size:12px;color:#5f5e5a;margin-bottom:6px;display:flex;justify-content:space-between}
+.prog-bar{height:4px;background:#e8e7e3;border-radius:2px}
+.prog-fill{height:4px;background:#185fa5;border-radius:2px;transition:width 0.4s ease}
+.card{background:white;border-radius:12px;border:0.5px solid rgba(0,0,0,0.1);padding:1.5rem;margin-bottom:1rem}
+.sec-badge{display:inline-block;font-size:11px;font-weight:500;background:#E6F1FB;color:#0C447C;padding:2px 8px;border-radius:20px;margin-bottom:8px}
+.sec-title{font-size:18px;font-weight:500;color:#1a3a5c;line-height:1.3;margin-bottom:4px}
+.sec-sub{font-size:13px;color:#5f5e5a;margin-bottom:1.25rem}
+.q{margin-bottom:1.25rem}
+.q-text{font-size:14px;color:#1a1a18;margin-bottom:10px;line-height:1.5}
+.q-text .req{color:#a32d2d}
+input[type=text],textarea,select{width:100%;border:1px solid #d3d1c7;border-radius:8px;padding:10px 12px;font-size:14px;color:#1a1a18;background:white;font-family:inherit;transition:border-color 0.2s}
+input[type=text]:focus,textarea:focus,select:focus{outline:none;border-color:#185fa5;box-shadow:0 0 0 3px rgba(24,95,165,0.1)}
+textarea{min-height:90px;resize:vertical}
+.options{display:flex;flex-direction:column;gap:6px}
+.opt-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid #e8e7e3;cursor:pointer;transition:all 0.15s;user-select:none}
+.opt-item:hover{border-color:#185fa5;background:#f0f6ff}
+.opt-item.selected{border-color:#185fa5;background:#E6F1FB}
+.opt-circle{width:16px;height:16px;border-radius:50%;border:2px solid #b4b2a9;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.opt-square{width:16px;height:16px;border-radius:3px;border:2px solid #b4b2a9;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.opt-item.selected .opt-circle,.opt-item.selected .opt-square{border-color:#185fa5;background:#185fa5}
+.opt-dot{width:6px;height:6px;border-radius:50%;background:white;display:none}
+.opt-check{display:none}
+.opt-item.selected .opt-dot,.opt-item.selected .opt-check{display:block}
+.opt-text{font-size:13.5px;color:#1a1a18;line-height:1.4}
+.scale-wrap{overflow-x:auto;margin-bottom:0.5rem}
+.scale-t{width:100%;border-collapse:collapse;font-size:12px;min-width:420px}
+.scale-t th{background:#f5f4f0;padding:7px 6px;text-align:center;font-weight:500;color:#5f5e5a;border-bottom:1px solid #e8e7e3}
+.scale-t th:first-child{text-align:left;min-width:160px}
+.scale-t td{padding:7px 6px;border-bottom:1px solid #f1efe8;text-align:center;color:#1a1a18;vertical-align:middle}
+.scale-t td:first-child{text-align:left;font-size:13px;padding-right:12px}
+.scale-t tr:last-child td{border-bottom:none}
+.scale-t tr:hover td{background:#fafaf8}
+.scale-radio{width:18px;height:18px;cursor:pointer;accent-color:#185fa5}
+.drug-t{width:100%;border-collapse:collapse;font-size:12.5px}
+.drug-t th{background:#f5f4f0;padding:6px 8px;text-align:left;font-weight:500;color:#5f5e5a;border-bottom:1px solid #e8e7e3}
+.drug-t td{padding:6px 8px;border-bottom:1px solid #f1efe8;color:#1a1a18;vertical-align:middle}
+.drug-t tr:last-child td{border-bottom:none}
+.dose-chip{display:inline-block;background:#E6F1FB;color:#0C447C;border-radius:4px;padding:1px 6px;font-size:11px;margin:1px}
+.drug-check{accent-color:#185fa5;width:15px;height:15px;cursor:pointer;vertical-align:middle}
+.drug-select{width:110px;font-size:12px;padding:3px 6px;border:1px solid #d3d1c7;border-radius:6px;margin-left:4px}
+.divider{height:1px;background:#f1efe8;margin:1.25rem 0}
+.alert{padding:10px 12px;border-radius:8px;font-size:12.5px;margin-bottom:1rem;border-left:3px solid}
+.alert-info{background:#E6F1FB;border-color:#185fa5;color:#0C447C}
+.alert-warn{background:#FCEBEB;border-color:#A32D2D;color:#791F1F}
+.alert-cond{background:#FAEEDA;border-color:#BA7517;color:#633806}
+.nav-row{display:flex;gap:8px;margin-top:1.5rem;padding-top:1rem;border-top:1px solid #f1efe8}
+.btn-next{flex:1;padding:12px;background:#185fa5;color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.15s}
+.btn-next:hover{background:#0C447C}
+.btn-next.green{background:#0f6e56}
+.btn-next.green:hover{background:#085041}
+.btn-back{padding:12px 16px;background:white;border:1px solid #d3d1c7;border-radius:8px;font-size:14px;color:#5f5e5a;cursor:pointer;font-family:inherit;transition:all 0.15s}
+.btn-back:hover{background:#f5f4f0}
+.sec-view{display:none}
+.sec-view.active{display:block}
+.cond-block{display:none}
+.cond-block.show{display:block}
+/* Pantalla de envío */
+.send-screen{text-align:center;padding:2.5rem 1.5rem}
+.send-icon{width:64px;height:64px;background:#EAF3DE;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem}
+.send-title{font-size:20px;font-weight:500;color:#1a3a5c;margin-bottom:8px}
+.send-sub{font-size:13px;color:#5f5e5a;line-height:1.6;margin-bottom:1.5rem}
+.send-note{font-size:12px;color:#888;background:#f5f4f0;border-radius:8px;padding:10px 14px;margin-top:1rem}
+@media print{body{background:white;padding:0}.app-header,.prog-wrap,.nav-row{display:none!important}.card{box-shadow:none;border:1px solid #e8e7e3;break-inside:avoid}}
+</style>
+<!-- ══ FIREBASE CONFIG — reemplace con sus propios valores ══ -->
+<script>
+  // PASO 1: Pegue aquí su configuración de Firebase
+  const FIREBASE_CONFIG = {
+    apiKey:            "AIzaSyBd3THcCXLPhukUU7n2MVGydqjHEYGsMMY",
+    authDomain:        "preconsulta-clinic.firebaseapp.com",
+    databaseURL:       "https://preconsulta-clinic-default-rtdb.firebaseio.com",
+    projectId:         "preconsulta-clinic",
+    storageBucket:     "preconsulta-clinic.firebasestorage.app",
+    messagingSenderId: "202970335277",
+    appId:             "1:202970335277:web:8e64c8ed2b7db3bc7610a4"
+  };
+</script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  firebase.initializeApp(FIREBASE_CONFIG);
+</script>
+</head>
+<body>
+<div class="app">
+
+<div class="app-header">
+  <h1>Formulario de Pre-Consulta</h1>
+  <p>Neurología &amp; Salud Mental &middot; Sus respuestas son confidenciales y solo las verá su médico</p>
+</div>
+
+<div class="prog-wrap">
+  <div class="prog-label"><span id="sec-name">Bienvenida</span><span id="sec-count">1 / 5</span></div>
+  <div class="prog-bar"><div class="prog-fill" id="prog" style="width:20%"></div></div>
+</div>
+
+<!-- S1: BIENVENIDA -->
+<div id="s1" class="card sec-view active">
+  <span class="sec-badge">Sección 1 de 5</span>
+  <div class="sec-title">Bienvenido/a</div>
+  <div class="sec-sub">Por favor complete este formulario antes de su consulta. Sus respuestas ayudarán al médico a prepararse para atenderle mejor.</div>
+
+  <div class="q">
+    <div class="q-text">Nombre completo <span class="req">*</span></div>
+    <input type="text" id="nombre" placeholder="Ej: María González">
+  </div>
+
+  <div class="q">
+    <div class="q-text">¿A qué hora es su consulta? <span class="req">*</span></div>
+    <select id="horario" style="max-width:220px">
+      <option value="">— Seleccione la hora —</option>
+      <option>08:00</option><option>08:15</option><option>08:30</option><option>08:45</option>
+      <option>09:00</option><option>09:15</option><option>09:30</option><option>09:45</option>
+      <option>10:00</option><option>10:15</option><option>10:30</option><option>10:45</option>
+      <option>11:00</option><option>11:15</option><option>11:30</option><option>11:45</option>
+      <option>12:00</option><option>12:15</option><option>12:30</option><option>12:45</option>
+      <option>13:00</option><option>13:15</option><option>13:30</option><option>13:45</option>
+      <option>14:00</option><option>14:15</option><option>14:30</option><option>14:45</option>
+      <option>15:00</option><option>15:15</option><option>15:30</option><option>15:45</option>
+      <option>16:00</option><option>16:15</option><option>16:30</option><option>16:45</option>
+      <option>17:00</option><option>17:15</option><option>17:30</option><option>17:45</option>
+      <option>18:00</option><option>18:15</option><option>18:30</option><option>18:45</option>
+      <option>19:00</option><option>19:15</option><option>19:30</option><option>19:45</option>
+      <option>20:00</option>
+    </select>
+  </div>
+
+  <div class="q">
+    <div class="q-text">Nivel de estudios</div>
+    <div class="options" id="estudios">
+      <div class="opt-item" data-v="Educación básica o media"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Educación básica o media</span></div>
+      <div class="opt-item" data-v="Cursando universidad o instituto"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Cursando universidad o instituto</span></div>
+      <div class="opt-item" data-v="Título universitario"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Título universitario</span></div>
+      <div class="opt-item" data-v="Postgrado o magíster"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Postgrado o magíster</span></div>
+      <div class="opt-item" data-v="Trabajando (sin estudios en curso)"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Trabajando (sin estudios en curso)</span></div>
+    </div>
+  </div>
+
+  <div class="nav-row"><button class="btn-next" onclick="goTo(2)">Continuar →</button></div>
+</div>
+
+<!-- S2: MOTIVO DE CONSULTA -->
+<div id="s2" class="card sec-view">
+  <span class="sec-badge">Sección 2 de 5</span>
+  <div class="sec-title">Motivo de consulta principal</div>
+  <div class="sec-sub">Seleccione el motivo <strong>principal</strong>. Solo uno. Las preguntas que siguen se adaptarán según su selección.</div>
+  <div class="q">
+    <div class="q-text">¿Cuál es el motivo principal de su consulta? <span class="req">*</span></div>
+    <div class="options" id="motivos">
+      <div class="opt-item" data-v="cefalea"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Dolor de cabeza / cefalea</span></div>
+      <div class="opt-item" data-v="insomnio"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Problemas para dormir / insomnio</span></div>
+      <div class="opt-item" data-v="tdah"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Dificultad de concentración o atención (TDAH)</span></div>
+      <div class="opt-item" data-v="tea"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Trastorno del espectro autista (TEA)</span></div>
+      <div class="opt-item" data-v="depresion"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Estado de ánimo bajo, tristeza o desesperanza</span></div>
+      <div class="opt-item" data-v="ansiedad"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Nerviosismo, angustia o ansiedad excesiva</span></div>
+      <div class="opt-item" data-v="mareos"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Mareos, vértigo o inestabilidad</span></div>
+      <div class="opt-item" data-v="memoria"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Problemas de memoria o confusión</span></div>
+      <div class="opt-item" data-v="seguimiento"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Control de medicación / seguimiento</span></div>
+    </div>
+  </div>
+  <div class="q">
+    <div class="q-text">Explique brevemente con sus palabras qué es lo que espera resolver con esta consulta <span class="req">*</span></div>
+    <textarea id="preguntas" placeholder="Ej: Quiero entender por qué me duele la cabeza frecuentemente y saber si hay algún tratamiento..."></textarea>
+  </div>
+  <div class="nav-row"><button class="btn-back" onclick="goTo(1)">← Atrás</button><button class="btn-next" onclick="goTo(3)">Continuar →</button></div>
+</div>
+
+<!-- S3: CUESTIONARIO SEGÚN MOTIVO -->
+<div id="s3" class="card sec-view">
+  <span class="sec-badge">Sección 3 de 5</span>
+  <div id="s5-title-cef" style="display:none"><div class="sec-title">Dolor de cabeza</div><div class="sec-sub">Complete los detalles de su cefalea.</div></div>
+  <div id="s5-title-scale" style="display:none"><div class="sec-title">Cuestionario clínico</div><div class="sec-sub">Evalúe cómo se ha sentido en las últimas 2 semanas.</div></div>
+  <div id="s5-title-other" style="display:none"><div class="sec-title">Para finalizar</div><div class="sec-sub">Gracias por completar el formulario.</div></div>
+
+  <!-- CEFALEA -->
+  <div id="cef-block" class="cond-block">
+    <div class="q"><div class="q-text">Tiempo de evolución</div><div class="options" id="cef-tiempo">
+      <div class="opt-item" data-v="Menos de 1 mes"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Menos de 1 mes</span></div>
+      <div class="opt-item" data-v="1–3 meses"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">1–3 meses</span></div>
+      <div class="opt-item" data-v="3–12 meses"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">3–12 meses</span></div>
+      <div class="opt-item" data-v="Más de 1 año"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Más de 1 año</span></div>
+      <div class="opt-item" data-v="Toda la vida"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Toda la vida (desde la infancia)</span></div>
+    </div></div>
+    <div class="q"><div class="q-text">Frecuencia de los episodios</div><div class="options" id="cef-frec">
+      <div class="opt-item" data-v="Menos de 1/mes"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Menos de 1 vez al mes</span></div>
+      <div class="opt-item" data-v="1–3/mes"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">1–3 veces al mes</span></div>
+      <div class="opt-item" data-v="1–2/semana"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">1–2 veces por semana</span></div>
+      <div class="opt-item" data-v="3–4/semana"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">3–4 veces por semana</span></div>
+      <div class="opt-item" data-v="≥15 días/mes"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">15 o más días al mes (casi diario)</span></div>
+    </div></div>
+    <div class="q"><div class="q-text">Duración habitual por episodio</div><div class="options" id="cef-dur">
+      <div class="opt-item" data-v="<30 min"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Menos de 30 minutos</span></div>
+      <div class="opt-item" data-v="30 min–4 h"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">30 minutos – 4 horas</span></div>
+      <div class="opt-item" data-v="4–72 h"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">4 – 72 horas</span></div>
+      <div class="opt-item" data-v=">72 h"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Más de 72 horas</span></div>
+      <div class="opt-item" data-v="Continuo"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Continuo (no cede)</span></div>
+    </div></div>
+    <div class="q"><div class="q-text">Localización del dolor</div><div class="options" id="cef-loc">
+      <div class="opt-item" data-v="Unilateral"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Solo un lado de la cabeza</span></div>
+      <div class="opt-item" data-v="Bilateral"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Ambos lados / toda la cabeza</span></div>
+      <div class="opt-item" data-v="Nuca/cuello"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Nuca o cuello</span></div>
+      <div class="opt-item" data-v="Retroorbitario"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Detrás o alrededor del ojo</span></div>
+      <div class="opt-item" data-v="Variable"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Variable (cambia de episodio a episodio)</span></div>
+    </div></div>
+    <div class="q"><div class="q-text">Tipo de dolor</div><div class="options" id="cef-tipo">
+      <div class="opt-item" data-v="Pulsátil"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Pulsátil / latido (como el pulso)</span></div>
+      <div class="opt-item" data-v="Opresivo"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Opresivo / presión / como casco apretado</span></div>
+      <div class="opt-item" data-v="Lancinante"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Lancinante / punzante / eléctrico</span></div>
+      <div class="opt-item" data-v="Quemante"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Quemante / ardor</span></div>
+    </div></div>
+    <div class="q"><div class="q-text">Intensidad promedio</div><div class="options" id="cef-int">
+      <div class="opt-item" data-v="Leve (1–3)"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Leve (1–3): no interrumpe actividades</span></div>
+      <div class="opt-item" data-v="Moderado (4–6)"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Moderado (4–6): dificulta algunas actividades</span></div>
+      <div class="opt-item" data-v="Severo (7–8)"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Severo (7–8): impide actividades normales</span></div>
+      <div class="opt-item" data-v="Muy severo (9–10)"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Muy severo (9–10): incapacitante</span></div>
+    </div></div>
+    <div class="q"><div class="q-text">Síntomas acompañantes <span style="color:#888;font-size:12px">(marque todos los que tenga)</span></div>
+      <div class="options" id="cef-sint">
+        <div class="opt-item" data-v="Náuseas"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Náuseas</span></div>
+        <div class="opt-item" data-v="Vómitos"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Vómitos</span></div>
+        <div class="opt-item" data-v="Fotofobia"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Molestia intensa con la luz (fotofobia)</span></div>
+        <div class="opt-item" data-v="Fonofobia"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Molestia intensa con los sonidos (fonofobia)</span></div>
+        <div class="opt-item" data-v="Empeora con actividad"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Empeora al moverse o hacer actividad física</span></div>
+        <div class="opt-item" data-v="Lagrimeo/ojo rojo ipsilateral"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Lagrimeo u ojo rojo (mismo lado del dolor)</span></div>
+        <div class="opt-item" data-v="Rinorrea ipsilateral"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Congestión o rinorrea (mismo lado)</span></div>
+        <div class="opt-item" data-v="Ptosis/miosis"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Párpado caído u ojo más pequeño</span></div>
+        <div class="opt-item" data-v="Agitación durante el dolor"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Necesidad de moverse / agitación durante el dolor</span></div>
+      </div>
+    </div>
+    <div class="q"><div class="q-text">¿Tiene señales de aviso antes del dolor (aura)?</div>
+      <div class="options" id="cef-aura">
+        <div class="opt-item" data-v="Aura visual"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Luces, puntos o líneas en zigzag (aura visual)</span></div>
+        <div class="opt-item" data-v="Aura sensitiva"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Hormigueo o adormecimiento en cara o brazo</span></div>
+        <div class="opt-item" data-v="Aura lenguaje"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Dificultad para hablar o encontrar palabras</span></div>
+        <div class="opt-item" data-v="Debilidad unilateral ⚠"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Debilidad en un lado del cuerpo ⚠</span></div>
+        <div class="opt-item" data-v="Sin aura"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">No tengo señales de aviso</span></div>
+      </div>
+    </div>
+    <div class="q"><div class="q-text">Uso de analgésicos para la cefalea</div><div class="options" id="cef-analg">
+      <div class="opt-item" data-v="Raramente (<4 días/mes)"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Raramente (menos de 4 días al mes)</span></div>
+      <div class="opt-item" data-v="A veces (4–9 días/mes)"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">A veces (4–9 días al mes)</span></div>
+      <div class="opt-item" data-v="Frecuentemente (≥10 días/mes) ⚠"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Frecuentemente (10 o más días al mes) ⚠</span></div>
+      <div class="opt-item" data-v="No uso analgésicos"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">No uso analgésicos</span></div>
+    </div></div>
+  </div>
+
+  <!-- ISI -->
+  <div id="isi-block" class="cond-block">
+    <div style="font-size:13px;font-weight:500;color:#1a3a5c;margin-bottom:8px">Sueño — ISI (Índice de Severidad del Insomnio)</div>
+    <div class="alert alert-info">Evalúe la gravedad de sus dificultades para dormir en las últimas 2 semanas.</div>
+    <div class="scale-wrap"><table class="scale-t">
+      <tr><th>Dificultad para…</th><th>Ninguna<br><small>0</small></th><th>Leve<br><small>1</small></th><th>Moderada<br><small>2</small></th><th>Grave<br><small>3</small></th><th>Muy grave<br><small>4</small></th></tr>
+      <tr><td>Conciliar el sueño</td><td><input type="radio" class="scale-radio" name="isi0" value="0"></td><td><input type="radio" class="scale-radio" name="isi0" value="1"></td><td><input type="radio" class="scale-radio" name="isi0" value="2"></td><td><input type="radio" class="scale-radio" name="isi0" value="3"></td><td><input type="radio" class="scale-radio" name="isi0" value="4"></td></tr>
+      <tr><td>Mantener el sueño (despertares)</td><td><input type="radio" class="scale-radio" name="isi1" value="0"></td><td><input type="radio" class="scale-radio" name="isi1" value="1"></td><td><input type="radio" class="scale-radio" name="isi1" value="2"></td><td><input type="radio" class="scale-radio" name="isi1" value="3"></td><td><input type="radio" class="scale-radio" name="isi1" value="4"></td></tr>
+      <tr><td>Despertar muy temprano</td><td><input type="radio" class="scale-radio" name="isi2" value="0"></td><td><input type="radio" class="scale-radio" name="isi2" value="1"></td><td><input type="radio" class="scale-radio" name="isi2" value="2"></td><td><input type="radio" class="scale-radio" name="isi2" value="3"></td><td><input type="radio" class="scale-radio" name="isi2" value="4"></td></tr>
+    </table></div>
+    <div class="scale-wrap" style="margin-top:6px"><table class="scale-t">
+      <tr><th></th><th>Muy satisfecho/a<br><small>0</small></th><th>Satisfecho/a<br><small>1</small></th><th>Indiferente<br><small>2</small></th><th>Insatisfecho/a<br><small>3</small></th><th>Muy insatisfecho/a<br><small>4</small></th></tr>
+      <tr><td>Satisfacción con su sueño actual</td><td><input type="radio" class="scale-radio" name="isi3" value="0"></td><td><input type="radio" class="scale-radio" name="isi3" value="1"></td><td><input type="radio" class="scale-radio" name="isi3" value="2"></td><td><input type="radio" class="scale-radio" name="isi3" value="3"></td><td><input type="radio" class="scale-radio" name="isi3" value="4"></td></tr>
+    </table></div>
+    <div class="scale-wrap" style="margin-top:6px"><table class="scale-t">
+      <tr><th></th><th>Nada<br><small>0</small></th><th>Poco<br><small>1</small></th><th>Algo<br><small>2</small></th><th>Bastante<br><small>3</small></th><th>Muchísimo<br><small>4</small></th></tr>
+      <tr><td>Interferencia en vida diaria</td><td><input type="radio" class="scale-radio" name="isi4" value="0"></td><td><input type="radio" class="scale-radio" name="isi4" value="1"></td><td><input type="radio" class="scale-radio" name="isi4" value="2"></td><td><input type="radio" class="scale-radio" name="isi4" value="3"></td><td><input type="radio" class="scale-radio" name="isi4" value="4"></td></tr>
+      <tr><td>Notado por quienes le rodean</td><td><input type="radio" class="scale-radio" name="isi5" value="0"></td><td><input type="radio" class="scale-radio" name="isi5" value="1"></td><td><input type="radio" class="scale-radio" name="isi5" value="2"></td><td><input type="radio" class="scale-radio" name="isi5" value="3"></td><td><input type="radio" class="scale-radio" name="isi5" value="4"></td></tr>
+      <tr><td>Preocupación por el sueño</td><td><input type="radio" class="scale-radio" name="isi6" value="0"></td><td><input type="radio" class="scale-radio" name="isi6" value="1"></td><td><input type="radio" class="scale-radio" name="isi6" value="2"></td><td><input type="radio" class="scale-radio" name="isi6" value="3"></td><td><input type="radio" class="scale-radio" name="isi6" value="4"></td></tr>
+    </table></div>
+    <div class="divider"></div>
+  </div>
+
+  <!-- PHQ-9 -->
+  <div id="phq-block" class="cond-block">
+    <div style="font-size:13px;font-weight:500;color:#1a3a5c;margin-bottom:8px">Estado de ánimo — PHQ-9</div>
+    <div class="alert alert-info">En las últimas 2 semanas, ¿con qué frecuencia le han molestado estos problemas?</div>
+    <div class="scale-wrap"><table class="scale-t">
+      <tr><th>Problema</th><th>Nunca<br><small>0</small></th><th>Varios días<br><small>1</small></th><th>+Mitad días<br><small>2</small></th><th>Casi siempre<br><small>3</small></th></tr>
+      <tr><td>Poco interés o placer en hacer cosas</td><td><input type="radio" class="scale-radio" name="phq0" value="0"></td><td><input type="radio" class="scale-radio" name="phq0" value="1"></td><td><input type="radio" class="scale-radio" name="phq0" value="2"></td><td><input type="radio" class="scale-radio" name="phq0" value="3"></td></tr>
+      <tr><td>Sentirse decaído/a o sin esperanza</td><td><input type="radio" class="scale-radio" name="phq1" value="0"></td><td><input type="radio" class="scale-radio" name="phq1" value="1"></td><td><input type="radio" class="scale-radio" name="phq1" value="2"></td><td><input type="radio" class="scale-radio" name="phq1" value="3"></td></tr>
+      <tr><td>Dificultad para dormir o dormir en exceso</td><td><input type="radio" class="scale-radio" name="phq2" value="0"></td><td><input type="radio" class="scale-radio" name="phq2" value="1"></td><td><input type="radio" class="scale-radio" name="phq2" value="2"></td><td><input type="radio" class="scale-radio" name="phq2" value="3"></td></tr>
+      <tr><td>Cansancio o poca energía</td><td><input type="radio" class="scale-radio" name="phq3" value="0"></td><td><input type="radio" class="scale-radio" name="phq3" value="1"></td><td><input type="radio" class="scale-radio" name="phq3" value="2"></td><td><input type="radio" class="scale-radio" name="phq3" value="3"></td></tr>
+      <tr><td>Poco apetito o comer en exceso</td><td><input type="radio" class="scale-radio" name="phq4" value="0"></td><td><input type="radio" class="scale-radio" name="phq4" value="1"></td><td><input type="radio" class="scale-radio" name="phq4" value="2"></td><td><input type="radio" class="scale-radio" name="phq4" value="3"></td></tr>
+      <tr><td>Sentirse mal consigo mismo/a o un fracaso</td><td><input type="radio" class="scale-radio" name="phq5" value="0"></td><td><input type="radio" class="scale-radio" name="phq5" value="1"></td><td><input type="radio" class="scale-radio" name="phq5" value="2"></td><td><input type="radio" class="scale-radio" name="phq5" value="3"></td></tr>
+      <tr><td>Dificultad para concentrarse</td><td><input type="radio" class="scale-radio" name="phq6" value="0"></td><td><input type="radio" class="scale-radio" name="phq6" value="1"></td><td><input type="radio" class="scale-radio" name="phq6" value="2"></td><td><input type="radio" class="scale-radio" name="phq6" value="3"></td></tr>
+      <tr><td>Moverse o hablar más lento / o agitado/a</td><td><input type="radio" class="scale-radio" name="phq7" value="0"></td><td><input type="radio" class="scale-radio" name="phq7" value="1"></td><td><input type="radio" class="scale-radio" name="phq7" value="2"></td><td><input type="radio" class="scale-radio" name="phq7" value="3"></td></tr>
+      <tr><td>Pensamientos de hacerse daño</td><td><input type="radio" class="scale-radio" name="phq8" value="0"></td><td><input type="radio" class="scale-radio" name="phq8" value="1"></td><td><input type="radio" class="scale-radio" name="phq8" value="2"></td><td><input type="radio" class="scale-radio" name="phq8" value="3"></td></tr>
+    </table></div>
+    <div class="divider"></div>
+  </div>
+
+  <!-- GAD-7 -->
+  <div id="gad-block" class="cond-block">
+    <div style="font-size:13px;font-weight:500;color:#1a3a5c;margin-bottom:8px">Ansiedad — GAD-7</div>
+    <div class="alert alert-info">En las últimas 2 semanas, ¿con qué frecuencia le han molestado estos problemas?</div>
+    <div class="scale-wrap"><table class="scale-t">
+      <tr><th>Problema</th><th>Nunca<br><small>0</small></th><th>Varios días<br><small>1</small></th><th>+Mitad días<br><small>2</small></th><th>Casi siempre<br><small>3</small></th></tr>
+      <tr><td>Sentirse nervioso/a o al límite</td><td><input type="radio" class="scale-radio" name="gad0" value="0"></td><td><input type="radio" class="scale-radio" name="gad0" value="1"></td><td><input type="radio" class="scale-radio" name="gad0" value="2"></td><td><input type="radio" class="scale-radio" name="gad0" value="3"></td></tr>
+      <tr><td>No poder controlar las preocupaciones</td><td><input type="radio" class="scale-radio" name="gad1" value="0"></td><td><input type="radio" class="scale-radio" name="gad1" value="1"></td><td><input type="radio" class="scale-radio" name="gad1" value="2"></td><td><input type="radio" class="scale-radio" name="gad1" value="3"></td></tr>
+      <tr><td>Preocuparse demasiado por todo</td><td><input type="radio" class="scale-radio" name="gad2" value="0"></td><td><input type="radio" class="scale-radio" name="gad2" value="1"></td><td><input type="radio" class="scale-radio" name="gad2" value="2"></td><td><input type="radio" class="scale-radio" name="gad2" value="3"></td></tr>
+      <tr><td>Dificultad para relajarse</td><td><input type="radio" class="scale-radio" name="gad3" value="0"></td><td><input type="radio" class="scale-radio" name="gad3" value="1"></td><td><input type="radio" class="scale-radio" name="gad3" value="2"></td><td><input type="radio" class="scale-radio" name="gad3" value="3"></td></tr>
+      <tr><td>Tan inquieto/a que no puede estar quieto/a</td><td><input type="radio" class="scale-radio" name="gad4" value="0"></td><td><input type="radio" class="scale-radio" name="gad4" value="1"></td><td><input type="radio" class="scale-radio" name="gad4" value="2"></td><td><input type="radio" class="scale-radio" name="gad4" value="3"></td></tr>
+      <tr><td>Irritarse o molestarse fácilmente</td><td><input type="radio" class="scale-radio" name="gad5" value="0"></td><td><input type="radio" class="scale-radio" name="gad5" value="1"></td><td><input type="radio" class="scale-radio" name="gad5" value="2"></td><td><input type="radio" class="scale-radio" name="gad5" value="3"></td></tr>
+      <tr><td>Sentir miedo de que algo terrible pasará</td><td><input type="radio" class="scale-radio" name="gad6" value="0"></td><td><input type="radio" class="scale-radio" name="gad6" value="1"></td><td><input type="radio" class="scale-radio" name="gad6" value="2"></td><td><input type="radio" class="scale-radio" name="gad6" value="3"></td></tr>
+    </table></div>
+    <div class="divider"></div>
+  </div>
+
+  <!-- ASRS -->
+  <div id="asrs-block" class="cond-block">
+    <div style="font-size:13px;font-weight:500;color:#1a3a5c;margin-bottom:8px">Atención e hiperactividad — ASRS-v1.1 (Partes A y B)</div>
+    <div class="alert alert-info">Piense en cómo se ha comportado en los últimos 6 meses. <strong>Parte A (ítems 1–6):</strong> tamizaje.</div>
+    <div class="scale-wrap"><table class="scale-t">
+      <tr><th>Pregunta</th><th>Nunca<br><small>0</small></th><th>Raramente<br><small>1</small></th><th>A veces<br><small>2</small></th><th>Frecuente<br><small>3</small></th><th>Muy seguido<br><small>4</small></th></tr>
+      <tr><td><strong>1.</strong> Dificultad para terminar los detalles finales de proyectos</td><td><input type="radio" class="scale-radio" name="asrs0" value="0"></td><td><input type="radio" class="scale-radio" name="asrs0" value="1"></td><td><input type="radio" class="scale-radio" name="asrs0" value="2"></td><td><input type="radio" class="scale-radio" name="asrs0" value="3"></td><td><input type="radio" class="scale-radio" name="asrs0" value="4"></td></tr>
+      <tr><td><strong>2.</strong> Dificultad para ordenar o planificar tareas</td><td><input type="radio" class="scale-radio" name="asrs1" value="0"></td><td><input type="radio" class="scale-radio" name="asrs1" value="1"></td><td><input type="radio" class="scale-radio" name="asrs1" value="2"></td><td><input type="radio" class="scale-radio" name="asrs1" value="3"></td><td><input type="radio" class="scale-radio" name="asrs1" value="4"></td></tr>
+      <tr><td><strong>3.</strong> Dificultad para recordar citas u obligaciones</td><td><input type="radio" class="scale-radio" name="asrs2" value="0"></td><td><input type="radio" class="scale-radio" name="asrs2" value="1"></td><td><input type="radio" class="scale-radio" name="asrs2" value="2"></td><td><input type="radio" class="scale-radio" name="asrs2" value="3"></td><td><input type="radio" class="scale-radio" name="asrs2" value="4"></td></tr>
+      <tr><td><strong>4.</strong> Evitar o postergar tareas que requieren concentración</td><td><input type="radio" class="scale-radio" name="asrs3" value="0"></td><td><input type="radio" class="scale-radio" name="asrs3" value="1"></td><td><input type="radio" class="scale-radio" name="asrs3" value="2"></td><td><input type="radio" class="scale-radio" name="asrs3" value="3"></td><td><input type="radio" class="scale-radio" name="asrs3" value="4"></td></tr>
+      <tr><td><strong>5.</strong> Agitar manos o pies al estar mucho tiempo sentado/a</td><td><input type="radio" class="scale-radio" name="asrs4" value="0"></td><td><input type="radio" class="scale-radio" name="asrs4" value="1"></td><td><input type="radio" class="scale-radio" name="asrs4" value="2"></td><td><input type="radio" class="scale-radio" name="asrs4" value="3"></td><td><input type="radio" class="scale-radio" name="asrs4" value="4"></td></tr>
+      <tr><td><strong>6.</strong> Sentirse demasiado activo/a, como con un motor</td><td><input type="radio" class="scale-radio" name="asrs5" value="0"></td><td><input type="radio" class="scale-radio" name="asrs5" value="1"></td><td><input type="radio" class="scale-radio" name="asrs5" value="2"></td><td><input type="radio" class="scale-radio" name="asrs5" value="3"></td><td><input type="radio" class="scale-radio" name="asrs5" value="4"></td></tr>
+    </table></div>
+    <div class="alert alert-info" style="margin-top:8px"><strong>Parte B (ítems 7–18):</strong> información adicional sobre síntomas.</div>
+    <div class="scale-wrap" style="margin-top:6px"><table class="scale-t">
+      <tr><th>Pregunta</th><th>Nunca<br><small>0</small></th><th>Raramente<br><small>1</small></th><th>A veces<br><small>2</small></th><th>Frecuente<br><small>3</small></th><th>Muy seguido<br><small>4</small></th></tr>
+      <tr><td><strong>7.</strong> Cometer errores por descuido en el trabajo</td><td><input type="radio" class="scale-radio" name="asrs6" value="0"></td><td><input type="radio" class="scale-radio" name="asrs6" value="1"></td><td><input type="radio" class="scale-radio" name="asrs6" value="2"></td><td><input type="radio" class="scale-radio" name="asrs6" value="3"></td><td><input type="radio" class="scale-radio" name="asrs6" value="4"></td></tr>
+      <tr><td><strong>8.</strong> Dificultad para mantener la atención en tareas</td><td><input type="radio" class="scale-radio" name="asrs7" value="0"></td><td><input type="radio" class="scale-radio" name="asrs7" value="1"></td><td><input type="radio" class="scale-radio" name="asrs7" value="2"></td><td><input type="radio" class="scale-radio" name="asrs7" value="3"></td><td><input type="radio" class="scale-radio" name="asrs7" value="4"></td></tr>
+      <tr><td><strong>9.</strong> Dificultad para concentrarse cuando le hablan directamente</td><td><input type="radio" class="scale-radio" name="asrs8" value="0"></td><td><input type="radio" class="scale-radio" name="asrs8" value="1"></td><td><input type="radio" class="scale-radio" name="asrs8" value="2"></td><td><input type="radio" class="scale-radio" name="asrs8" value="3"></td><td><input type="radio" class="scale-radio" name="asrs8" value="4"></td></tr>
+      <tr><td><strong>10.</strong> Dejar objetos fuera de su lugar</td><td><input type="radio" class="scale-radio" name="asrs9" value="0"></td><td><input type="radio" class="scale-radio" name="asrs9" value="1"></td><td><input type="radio" class="scale-radio" name="asrs9" value="2"></td><td><input type="radio" class="scale-radio" name="asrs9" value="3"></td><td><input type="radio" class="scale-radio" name="asrs9" value="4"></td></tr>
+      <tr><td><strong>11.</strong> Distraerse fácilmente con ruidos o eventos externos</td><td><input type="radio" class="scale-radio" name="asrs10" value="0"></td><td><input type="radio" class="scale-radio" name="asrs10" value="1"></td><td><input type="radio" class="scale-radio" name="asrs10" value="2"></td><td><input type="radio" class="scale-radio" name="asrs10" value="3"></td><td><input type="radio" class="scale-radio" name="asrs10" value="4"></td></tr>
+      <tr><td><strong>12.</strong> Levantarse del asiento en reuniones u otras situaciones</td><td><input type="radio" class="scale-radio" name="asrs11" value="0"></td><td><input type="radio" class="scale-radio" name="asrs11" value="1"></td><td><input type="radio" class="scale-radio" name="asrs11" value="2"></td><td><input type="radio" class="scale-radio" name="asrs11" value="3"></td><td><input type="radio" class="scale-radio" name="asrs11" value="4"></td></tr>
+      <tr><td><strong>13.</strong> Sentirse inquieto/a o con dificultad para relajarse</td><td><input type="radio" class="scale-radio" name="asrs12" value="0"></td><td><input type="radio" class="scale-radio" name="asrs12" value="1"></td><td><input type="radio" class="scale-radio" name="asrs12" value="2"></td><td><input type="radio" class="scale-radio" name="asrs12" value="3"></td><td><input type="radio" class="scale-radio" name="asrs12" value="4"></td></tr>
+      <tr><td><strong>14.</strong> Dificultad para relajarse en tiempo libre</td><td><input type="radio" class="scale-radio" name="asrs13" value="0"></td><td><input type="radio" class="scale-radio" name="asrs13" value="1"></td><td><input type="radio" class="scale-radio" name="asrs13" value="2"></td><td><input type="radio" class="scale-radio" name="asrs13" value="3"></td><td><input type="radio" class="scale-radio" name="asrs13" value="4"></td></tr>
+      <tr><td><strong>15.</strong> Hablar en exceso en situaciones sociales</td><td><input type="radio" class="scale-radio" name="asrs14" value="0"></td><td><input type="radio" class="scale-radio" name="asrs14" value="1"></td><td><input type="radio" class="scale-radio" name="asrs14" value="2"></td><td><input type="radio" class="scale-radio" name="asrs14" value="3"></td><td><input type="radio" class="scale-radio" name="asrs14" value="4"></td></tr>
+      <tr><td><strong>16.</strong> Terminar las frases de otros o hablar antes de que terminen</td><td><input type="radio" class="scale-radio" name="asrs15" value="0"></td><td><input type="radio" class="scale-radio" name="asrs15" value="1"></td><td><input type="radio" class="scale-radio" name="asrs15" value="2"></td><td><input type="radio" class="scale-radio" name="asrs15" value="3"></td><td><input type="radio" class="scale-radio" name="asrs15" value="4"></td></tr>
+      <tr><td><strong>17.</strong> Dificultad para esperar su turno</td><td><input type="radio" class="scale-radio" name="asrs16" value="0"></td><td><input type="radio" class="scale-radio" name="asrs16" value="1"></td><td><input type="radio" class="scale-radio" name="asrs16" value="2"></td><td><input type="radio" class="scale-radio" name="asrs16" value="3"></td><td><input type="radio" class="scale-radio" name="asrs16" value="4"></td></tr>
+      <tr><td><strong>18.</strong> Interrumpir actividades de otros</td><td><input type="radio" class="scale-radio" name="asrs17" value="0"></td><td><input type="radio" class="scale-radio" name="asrs17" value="1"></td><td><input type="radio" class="scale-radio" name="asrs17" value="2"></td><td><input type="radio" class="scale-radio" name="asrs17" value="3"></td><td><input type="radio" class="scale-radio" name="asrs17" value="4"></td></tr>
+    </table></div>
+    <div class="divider"></div>
+  </div>
+
+  <!-- AQ-10 -->
+  <div id="tea-block" class="cond-block">
+    <div style="font-size:13px;font-weight:500;color:#1a3a5c;margin-bottom:8px">Espectro autista — AQ-10</div>
+    <div class="alert alert-info">Indique con qué frecuencia se aplican a usted las siguientes afirmaciones. Punto de corte ≥6 sugiere evaluación especializada.</div>
+    <div class="scale-wrap"><table class="scale-t">
+      <tr><th>Afirmación</th><th>Def. de acuerdo<br><small>1</small></th><th>Lev. de acuerdo<br><small>1</small></th><th>Lev. en desacuerdo<br><small>0</small></th><th>Def. en desacuerdo<br><small>0</small></th></tr>
+      <tr><td><strong>1.</strong> Noto pequeños sonidos que otros no notan</td><td><input type="radio" class="scale-radio" name="aq0" value="1"></td><td><input type="radio" class="scale-radio" name="aq0" value="1"></td><td><input type="radio" class="scale-radio" name="aq0" value="0"></td><td><input type="radio" class="scale-radio" name="aq0" value="0"></td></tr>
+      <tr><td><strong>2.</strong> Me concentro más en el panorama completo que en los detalles</td><td><input type="radio" class="scale-radio" name="aq1" value="0"></td><td><input type="radio" class="scale-radio" name="aq1" value="0"></td><td><input type="radio" class="scale-radio" name="aq1" value="1"></td><td><input type="radio" class="scale-radio" name="aq1" value="1"></td></tr>
+      <tr><td><strong>3.</strong> Me resulta fácil hacer más de una cosa a la vez</td><td><input type="radio" class="scale-radio" name="aq2" value="0"></td><td><input type="radio" class="scale-radio" name="aq2" value="0"></td><td><input type="radio" class="scale-radio" name="aq2" value="1"></td><td><input type="radio" class="scale-radio" name="aq2" value="1"></td></tr>
+      <tr><td><strong>4.</strong> Si hay una interrupción me resulta muy difícil retomar lo que hacía</td><td><input type="radio" class="scale-radio" name="aq3" value="1"></td><td><input type="radio" class="scale-radio" name="aq3" value="1"></td><td><input type="radio" class="scale-radio" name="aq3" value="0"></td><td><input type="radio" class="scale-radio" name="aq3" value="0"></td></tr>
+      <tr><td><strong>5.</strong> Sé cómo interpretar cuándo alguien quiere entrar en conversación</td><td><input type="radio" class="scale-radio" name="aq4" value="0"></td><td><input type="radio" class="scale-radio" name="aq4" value="0"></td><td><input type="radio" class="scale-radio" name="aq4" value="1"></td><td><input type="radio" class="scale-radio" name="aq4" value="1"></td></tr>
+      <tr><td><strong>6.</strong> Me resulta fácil "leer entre líneas" cuando alguien me habla</td><td><input type="radio" class="scale-radio" name="aq5" value="0"></td><td><input type="radio" class="scale-radio" name="aq5" value="0"></td><td><input type="radio" class="scale-radio" name="aq5" value="1"></td><td><input type="radio" class="scale-radio" name="aq5" value="1"></td></tr>
+      <tr><td><strong>7.</strong> Cuando leo ficción me cuesta imaginar los personajes claramente</td><td><input type="radio" class="scale-radio" name="aq6" value="1"></td><td><input type="radio" class="scale-radio" name="aq6" value="1"></td><td><input type="radio" class="scale-radio" name="aq6" value="0"></td><td><input type="radio" class="scale-radio" name="aq6" value="0"></td></tr>
+      <tr><td><strong>8.</strong> Me atraen las fechas</td><td><input type="radio" class="scale-radio" name="aq7" value="1"></td><td><input type="radio" class="scale-radio" name="aq7" value="1"></td><td><input type="radio" class="scale-radio" name="aq7" value="0"></td><td><input type="radio" class="scale-radio" name="aq7" value="0"></td></tr>
+      <tr><td><strong>9.</strong> En un grupo social puedo seguir varias conversaciones a la vez</td><td><input type="radio" class="scale-radio" name="aq8" value="0"></td><td><input type="radio" class="scale-radio" name="aq8" value="0"></td><td><input type="radio" class="scale-radio" name="aq8" value="1"></td><td><input type="radio" class="scale-radio" name="aq8" value="1"></td></tr>
+      <tr><td><strong>10.</strong> Me siento incómodo/a en situaciones sociales nuevas</td><td><input type="radio" class="scale-radio" name="aq9" value="1"></td><td><input type="radio" class="scale-radio" name="aq9" value="1"></td><td><input type="radio" class="scale-radio" name="aq9" value="0"></td><td><input type="radio" class="scale-radio" name="aq9" value="0"></td></tr>
+    </table></div>
+    <div class="divider"></div>
+  </div>
+
+  <div class="nav-row"><button class="btn-back" onclick="goTo(2)">← Atrás</button><button class="btn-next" onclick="goTo(4)">Continuar →</button></div>
+</div>
+
+<!-- S4: ANTECEDENTES -->
+<div id="s4" class="card sec-view">
+  <span class="sec-badge">Sección 4 de 5</span>
+  <div class="sec-title">Antecedentes médicos</div>
+  <div class="sec-sub">Marque todas las que correspondan.</div>
+
+  <div class="q">
+    <div class="q-text">Condiciones crónicas</div>
+    <div class="options" id="antec">
+      <div class="opt-item" data-v="Hipertensión"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Hipertensión arterial</span></div>
+      <div class="opt-item" data-v="Diabetes"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Diabetes</span></div>
+      <div class="opt-item" data-v="Obesidad"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Obesidad</span></div>
+      <div class="opt-item" data-v="Colesterol alto"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Colesterol o triglicéridos elevados</span></div>
+      <div class="opt-item" data-v="Hipotiroidismo"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Hipotiroidismo</span></div>
+      <div class="opt-item" data-v="Anticonceptivos orales"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Uso de anticonceptivos orales</span></div>
+      <div class="opt-item" data-v="Tabaquismo"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Tabaquismo (fumador activo)</span></div>
+      <div class="opt-item" data-v="Ninguna"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Ninguna de las anteriores</span></div>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">Eventos vasculares o cardíacos previos</div>
+    <div class="options" id="vasculares">
+      <div class="opt-item" data-v="ACV"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Accidente cerebrovascular (ACV)</span></div>
+      <div class="opt-item" data-v="Infarto"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Infarto al corazón</span></div>
+      <div class="opt-item" data-v="TVP"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Trombosis venosa profunda (TVP)</span></div>
+      <div class="opt-item" data-v="Más de 3 abortos espontáneos"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Más de 3 abortos espontáneos</span></div>
+      <div class="opt-item" data-v="Ninguno"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Ninguno</span></div>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">Antecedentes familiares relevantes</div>
+    <div class="options" id="familiares">
+      <div class="opt-item" data-v="Trombofilia familiar"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Trombofilia conocida en familia</span></div>
+      <div class="opt-item" data-v="ACV familiar"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">ACV en familiar directo</span></div>
+      <div class="opt-item" data-v="Migraña familiar"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Migraña en familiar directo</span></div>
+      <div class="opt-item" data-v="Ninguno familiar"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Ninguno relevante</span></div>
+    </div>
+  </div>
+
+  <div class="nav-row"><button class="btn-back" onclick="goTo(3)">← Atrás</button><button class="btn-next" onclick="goTo(5)">Continuar →</button></div>
+</div>
+
+<!-- S5: MEDICAMENTOS -->
+<div id="s5" class="card sec-view">
+  <span class="sec-badge">Sección 5 de 5</span>
+  <div class="sec-title">Medicamentos actuales</div>
+  <div class="sec-sub">Marque los que usa habitualmente e indique la dosis.</div>
+  <div class="q">
+    <div class="q-text">¿Usa algún medicamento frecuentemente? <span class="req">*</span></div>
+    <div class="options" id="usamed">
+      <div class="opt-item" data-v="Si"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Sí</span></div>
+      <div class="opt-item" data-v="No"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">No</span></div>
+    </div>
+  </div>
+  <div id="meds-block" class="cond-block">
+    <div class="divider"></div>
+    <div style="font-size:12px;font-weight:600;color:#5f5e5a;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Fármacos para el sueño</div>
+    <div class="scale-wrap"><table class="drug-t">
+      <tr><th style="width:38%">Medicamento</th><th>Dosis disponibles</th><th style="width:130px">¿Lo usa? / Dosis</th></tr>
+      <tr><td>Zolpidem</td><td><span class="dose-chip">5mg</span><span class="dose-chip">10mg</span></td><td><input type="checkbox" class="drug-check" data-med="Zolpidem" onchange="toggleDose(this)"> <select id="d-Zolpidem" style="display:none" class="drug-select"><option>5 mg</option><option>10 mg</option></select></td></tr>
+      <tr><td>Zopiclona</td><td><span class="dose-chip">3.75mg</span><span class="dose-chip">7.5mg</span></td><td><input type="checkbox" class="drug-check" data-med="Zopiclona" onchange="toggleDose(this)"> <select id="d-Zopiclona" style="display:none" class="drug-select"><option>3.75 mg</option><option>7.5 mg</option></select></td></tr>
+      <tr><td>Clonazepam (para dormir)</td><td><span class="dose-chip">0.25mg</span><span class="dose-chip">0.5mg</span><span class="dose-chip">1mg</span></td><td><input type="checkbox" class="drug-check" data-med="Clonazepam-s" onchange="toggleDose(this)"> <select id="d-Clonazepam-s" style="display:none" class="drug-select"><option>0.25 mg</option><option>0.5 mg</option><option>1 mg</option><option>2 mg</option></select></td></tr>
+      <tr><td>Melatonina LP</td><td><span class="dose-chip">2mg</span><span class="dose-chip">5mg</span></td><td><input type="checkbox" class="drug-check" data-med="Melatonina" onchange="toggleDose(this)"> <select id="d-Melatonina" style="display:none" class="drug-select"><option>2 mg</option><option>5 mg</option></select></td></tr>
+      <tr><td>Trazodona</td><td><span class="dose-chip">25mg</span><span class="dose-chip">50mg</span><span class="dose-chip">100mg</span></td><td><input type="checkbox" class="drug-check" data-med="Trazodona" onchange="toggleDose(this)"> <select id="d-Trazodona" style="display:none" class="drug-select"><option>25 mg</option><option>50 mg</option><option>100 mg</option></select></td></tr>
+    </table></div>
+    <div class="divider"></div>
+    <div style="font-size:12px;font-weight:600;color:#5f5e5a;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Antidepresivos / ansiolíticos</div>
+    <div class="scale-wrap"><table class="drug-t">
+      <tr><th style="width:38%">Medicamento</th><th>Dosis disponibles</th><th style="width:130px">¿Lo usa? / Dosis</th></tr>
+      <tr><td>Sertralina</td><td><span class="dose-chip">25mg</span><span class="dose-chip">50mg</span><span class="dose-chip">100mg</span></td><td><input type="checkbox" class="drug-check" data-med="Sertralina" onchange="toggleDose(this)"> <select id="d-Sertralina" style="display:none" class="drug-select"><option>25 mg</option><option>50 mg</option><option>100 mg</option></select></td></tr>
+      <tr><td>Fluoxetina</td><td><span class="dose-chip">20mg</span><span class="dose-chip">40mg</span></td><td><input type="checkbox" class="drug-check" data-med="Fluoxetina" onchange="toggleDose(this)"> <select id="d-Fluoxetina" style="display:none" class="drug-select"><option>20 mg</option><option>40 mg</option></select></td></tr>
+      <tr><td>Escitalopram</td><td><span class="dose-chip">5mg</span><span class="dose-chip">10mg</span><span class="dose-chip">20mg</span></td><td><input type="checkbox" class="drug-check" data-med="Escitalopram" onchange="toggleDose(this)"> <select id="d-Escitalopram" style="display:none" class="drug-select"><option>5 mg</option><option>10 mg</option><option>20 mg</option></select></td></tr>
+      <tr><td>Venlafaxina XR</td><td><span class="dose-chip">37.5mg</span><span class="dose-chip">75mg</span><span class="dose-chip">150mg</span></td><td><input type="checkbox" class="drug-check" data-med="Venlafaxina" onchange="toggleDose(this)"> <select id="d-Venlafaxina" style="display:none" class="drug-select"><option>37.5 mg</option><option>75 mg</option><option>150 mg</option></select></td></tr>
+      <tr><td>Mirtazapina</td><td><span class="dose-chip">15mg</span><span class="dose-chip">30mg</span></td><td><input type="checkbox" class="drug-check" data-med="Mirtazapina" onchange="toggleDose(this)"> <select id="d-Mirtazapina" style="display:none" class="drug-select"><option>15 mg</option><option>30 mg</option></select></td></tr>
+      <tr><td>Clonazepam (ansiedad)</td><td><span class="dose-chip">0.25mg</span><span class="dose-chip">0.5mg</span><span class="dose-chip">1mg</span></td><td><input type="checkbox" class="drug-check" data-med="Clonazepam-a" onchange="toggleDose(this)"> <select id="d-Clonazepam-a" style="display:none" class="drug-select"><option>0.25 mg</option><option>0.5 mg</option><option>1 mg</option><option>2 mg</option></select></td></tr>
+      <tr><td>Duloxetina</td><td><span class="dose-chip">30mg</span><span class="dose-chip">60mg</span><span class="dose-chip">120mg</span></td><td><input type="checkbox" class="drug-check" data-med="Duloxetina" onchange="toggleDose(this)"> <select id="d-Duloxetina" style="display:none" class="drug-select"><option>30 mg</option><option>60 mg</option><option>120 mg</option></select></td></tr>
+      <tr><td>Quetiapina</td><td><span class="dose-chip">25mg</span><span class="dose-chip">50mg</span><span class="dose-chip">100mg</span></td><td><input type="checkbox" class="drug-check" data-med="Quetiapina" onchange="toggleDose(this)"> <select id="d-Quetiapina" style="display:none" class="drug-select"><option>25 mg</option><option>50 mg</option><option>100 mg</option><option>200 mg</option></select></td></tr>
+    </table></div>
+    <div class="divider"></div>
+    <div style="font-size:12px;font-weight:600;color:#5f5e5a;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Anticoagulantes</div>
+    <div class="scale-wrap"><table class="drug-t">
+      <tr><th style="width:38%">Medicamento</th><th>Dosis disponibles</th><th style="width:130px">¿Lo usa? / Dosis</th></tr>
+      <tr><td>Acenocumarol (Neosintrom)</td><td><span class="dose-chip">1mg</span><span class="dose-chip">4mg</span></td><td><input type="checkbox" class="drug-check" data-med="Acenocumarol" onchange="toggleDose(this)"> <select id="d-Acenocumarol" style="display:none" class="drug-select"><option>1 mg</option><option>4 mg</option></select></td></tr>
+      <tr><td>Rivaroxabán (Xarelto)</td><td><span class="dose-chip">10mg</span><span class="dose-chip">15mg</span><span class="dose-chip">20mg</span></td><td><input type="checkbox" class="drug-check" data-med="Rivaroxaban" onchange="toggleDose(this)"> <select id="d-Rivaroxaban" style="display:none" class="drug-select"><option>10 mg</option><option>15 mg</option><option>20 mg</option></select></td></tr>
+      <tr><td>AAS (aspirina) antiagregante</td><td><span class="dose-chip">100mg</span></td><td><input type="checkbox" class="drug-check" data-med="AAS-antiagregante" onchange="toggleDose(this)"> <select id="d-AAS-antiagregante" style="display:none" class="drug-select"><option>100 mg</option><option>500 mg</option></select></td></tr>
+    </table></div>
+    <div id="diabetes-meds" class="cond-block">
+      <div class="divider"></div>
+      <div style="font-size:12px;font-weight:600;color:#5f5e5a;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Fármacos para la diabetes</div>
+      <div class="scale-wrap"><table class="drug-t">
+        <tr><th style="width:38%">Medicamento</th><th>Dosis disponibles</th><th style="width:130px">¿Lo usa? / Dosis</th></tr>
+        <tr><td>Metformina</td><td><span class="dose-chip">500mg</span><span class="dose-chip">850mg</span><span class="dose-chip">1000mg</span></td><td><input type="checkbox" class="drug-check" data-med="Metformina" onchange="toggleDose(this)"> <select id="d-Metformina" style="display:none" class="drug-select"><option>500 mg</option><option>850 mg</option><option>1000 mg</option></select></td></tr>
+        <tr><td>Insulina</td><td><span class="dose-chip">Sí la uso</span></td><td><input type="checkbox" class="drug-check" data-med="Insulina" onchange="toggleDose(this)"></td></tr>
+      </table></div>
+    </div>
+    <div class="divider"></div>
+    <div class="q"><div class="q-text">Otro medicamento no listado (nombre y dosis)</div><input type="text" id="otro-med" placeholder="Ej: Levotiroxina 50 mcg"></div>
+  </div>
+  <div class="nav-row"><button class="btn-back" onclick="goTo(4)">← Atrás</button><button class="btn-next green" onclick="submitForm()">Enviar formulario →</button></div>
+</div>
+
+<!-- PANTALLA DE CONFIRMACIÓN (después del envío) -->
+<div id="s-sent" class="card sec-view" style="display:none">
+  <div class="send-screen">
+    <div class="send-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><polyline points="20,6 9,17 4,12" stroke="#27500A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="send-title">Formulario enviado correctamente</div>
+    <div class="send-sub">Sus respuestas han quedado registradas. El equipo médico revisará la información antes de su consulta.<br><br>Puede cerrar esta ventana o esperar a ser llamado/a.</div>
+    <div class="send-note">Si necesita corregir algo, avise al personal de recepción antes de su hora de atención.</div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+let cur=1;
+const TOTAL=5;
+const names=['','Bienvenida','Motivo de consulta','Cuestionario','Antecedentes','Medicamentos'];
+
+// ——— NOMBRE DEL ARCHIVO DEL DASHBOARD ———
+// Ajuste este valor al nombre real de su archivo dashboard:
+const DASHBOARD_FILE = 'dashboard_clinico.html';
+
+function getMotivo(){
+  const e=document.getElementById('motivos').querySelector('.opt-item.selected');
+  return e?e.dataset.v:'';
+}
+
+function goTo(n){
+  document.getElementById('s'+cur).classList.remove('active');
+  cur=n;
+  document.getElementById('s'+cur).classList.add('active');
+  document.getElementById('sec-name').textContent=names[n];
+  document.getElementById('sec-count').textContent=n+' / '+TOTAL;
+  document.getElementById('prog').style.width=Math.round((n/TOTAL)*100)+'%';
+  window.scrollTo(0,0);
+  if(n===5) showDiabetesMeds();
+  if(n===3) setupS3();
+}
+
+function setupS3(){
+  const m=getMotivo();
+  ['cef-block','isi-block','phq-block','gad-block','asrs-block','tea-block'].forEach(id=>{
+    document.getElementById(id).classList.remove('show');
+  });
+  ['s5-title-cef','s5-title-scale','s5-title-other'].forEach(id=>{
+    document.getElementById(id).style.display='none';
+  });
+  if(m==='cefalea'){document.getElementById('cef-block').classList.add('show');document.getElementById('s5-title-cef').style.display='';}
+  else if(m==='insomnio'){document.getElementById('isi-block').classList.add('show');document.getElementById('s5-title-scale').style.display='';}
+  else if(m==='depresion'){document.getElementById('phq-block').classList.add('show');document.getElementById('s5-title-scale').style.display='';}
+  else if(m==='ansiedad'){document.getElementById('gad-block').classList.add('show');document.getElementById('s5-title-scale').style.display='';}
+  else if(m==='tdah'){document.getElementById('asrs-block').classList.add('show');document.getElementById('s5-title-scale').style.display='';}
+  else if(m==='tea'){document.getElementById('tea-block').classList.add('show');document.getElementById('s5-title-scale').style.display='';}
+  else{document.getElementById('s5-title-other').style.display='';}
+}
+
+function showDiabetesMeds(){
+  document.getElementById('diabetes-meds').classList.toggle('show',getMulti('antec').includes('Diabetes'));
+}
+
+function initOpts(id,multi){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.querySelectorAll('.opt-item').forEach(item=>{
+    item.addEventListener('click',()=>{
+      if(multi) item.classList.toggle('selected');
+      else{el.querySelectorAll('.opt-item').forEach(i=>i.classList.remove('selected'));item.classList.add('selected');}
+    });
+  });
+}
+
+function getMulti(id){return[...document.getElementById(id).querySelectorAll('.opt-item.selected')].map(e=>e.dataset.v);}
+function getSingle(id){const el=document.getElementById(id);if(!el)return'';if(el.tagName==='SELECT')return el.value||'';const e=el.querySelector('.opt-item.selected');return e?e.dataset.v:'';}
+function toggleDose(cb){const s=document.getElementById('d-'+cb.dataset.med);if(s)s.style.display=cb.checked?'inline-block':'none';}
+function getScore(prefix,n){let t=0;for(let i=0;i<n;i++){const r=document.querySelector('input[name="'+prefix+i+'"]:checked');if(r)t+=+r.value;}return t;}
+function scoreInfo(s,cuts,lbls,clss){for(let i=0;i<cuts.length;i++)if(s<=cuts[i])return{l:lbls[i],c:clss[i]};return{l:lbls[lbls.length-1],c:clss[clss.length-1]};}
+
+function getMeds(){
+  const meds=[];
+  document.querySelectorAll('.drug-check:checked').forEach(cb=>{
+    const id='d-'+cb.dataset.med;const sel=document.getElementById(id);
+    const dose=sel&&sel.style.display!=='none'?' '+sel.value:'';
+    meds.push(cb.dataset.med.replace('-s',' (sueño)').replace('-a',' (ansiedad)')+dose);
+  });
+  const o=document.getElementById('otro-med').value.trim();if(o)meds.push(o);
+  return meds;
+}
+
+function getCefHipotesis(){
+  const loc=getSingle('cef-loc'),tipo=getSingle('cef-tipo'),intens=getSingle('cef-int');
+  const sint=getMulti('cef-sint'),aura=getMulti('cef-aura');
+  const analg=getSingle('cef-analg'),frec=getSingle('cef-frec'),dur=getSingle('cef-dur');
+  const puls=tipo==='Pulsátil',uni=loc==='Unilateral',sev=intens.includes('Severo')||intens.includes('Muy');
+  const naus=sint.includes('Náuseas')||sint.includes('Vómitos');
+  const foto=sint.includes('Fotofobia'),fono=sint.includes('Fonofobia'),empeora=sint.includes('Empeora con actividad');
+  const lagrimeo=sint.includes('Lagrimeo/ojo rojo ipsilateral'),rinorrea=sint.includes('Rinorrea ipsilateral');
+  const ptosis=sint.includes('Ptosis/miosis'),agit=sint.includes('Agitación durante el dolor');
+  const retro=loc==='Retroorbitario';
+  const conAura=aura.some(a=>a.includes('visual')||a.includes('sensitiva')||a.includes('lenguaje'));
+  const bil=loc==='Bilateral',opres=tipo==='Opresivo';
+  const racimos=(retro?1:0)+(lagrimeo?1:0)+(rinorrea?1:0)+(ptosis?1:0)+(agit?1:0)+(uni?1:0);
+  const migrana=(puls?1:0)+(uni?1:0)+(sev?1:0)+(empeora?1:0)+(naus?1:0)+((foto&&fono)?1:0);
+  let h='Sin datos suficientes para clasificar',niv='gray',crit=[];
+  if(racimos>=3&&dur==='<30 min'){h='Probable cefalea en racimos';niv='red';crit=['Dolor retroorbitario/unilateral severo','Síntomas autonómicos ipsilaterales','Duración corta (<30 min)'];}
+  else if(conAura&&migrana>=2){h='Probable migraña con aura';niv='amber';crit=['Aura reversible precediendo a la cefalea','≥2 características migrañosas (ICHD-3)'];}
+  else if(migrana>=3){h='Probable migraña sin aura';niv='amber';crit=['≥3 de 6 criterios ICHD-3 presentes'];}
+  else if(bil&&opres&&!naus){h='Probable cefalea tensional';niv='gray';crit=['Bilateral','Opresivo / presión','Sin náuseas'];}
+  else if(frec==='≥15 días/mes'&&analg&&analg.includes('≥10')){h='Posible cefalea por abuso de analgésicos (ICHD-3 §8.2)';niv='red';crit=['≥15 días/mes con cefalea','Uso de analgésicos ≥10 días/mes'];}
+  else if(frec){h='Patrón no concluyente — evaluar en consulta';niv='gray';crit=['Datos insuficientes para clasificación automática'];}
+  return{h,niv,crit,analg,aura};
+}
+
+function collectScores(motivo){
+  const cls4=['score-none','score-mild','score-mod','score-sev'];
+  const scores={};
+  if(motivo==='insomnio'){
+    const s=getScore('isi',7);
+    const i=scoreInfo(s,[7,14,21],['Sin insomnio','Subclínico','Moderado','Grave'],cls4);
+    scores.isi={total:s,max:28,label:i.l,cls:i.c,items:Array.from({length:7},(_,k)=>{const r=document.querySelector('input[name="isi'+k+'"]:checked');return r?+r.value:null;})};
+  }
+  if(motivo==='depresion'){
+    const s=getScore('phq',9);
+    const i=scoreInfo(s,[4,9,14,19],['Sin depresión','Leve','Moderada','Mod-grave','Grave'],[...cls4,'score-sev']);
+    scores.phq={total:s,max:27,label:i.l,cls:i.c,items:Array.from({length:9},(_,k)=>{const r=document.querySelector('input[name="phq'+k+'"]:checked');return r?+r.value:null;})};
+  }
+  if(motivo==='ansiedad'){
+    const s=getScore('gad',7);
+    const i=scoreInfo(s,[4,9,14],['Mínima','Leve','Moderada','Grave'],cls4);
+    scores.gad={total:s,max:21,label:i.l,cls:i.c,items:Array.from({length:7},(_,k)=>{const r=document.querySelector('input[name="gad'+k+'"]:checked');return r?+r.value:null;})};
+  }
+  if(motivo==='tdah'){
+    const sA=getScore('asrs',6);
+    const sTotal=getScore('asrs',18);
+    scores.asrs={partA:sA,partB:sTotal-sA,total:sTotal,max:72,items:Array.from({length:18},(_,k)=>{const r=document.querySelector('input[name="asrs'+k+'"]:checked');return r?+r.value:null;})};
+  }
+  if(motivo==='tea'){
+    const s=getScore('aq',10);
+    scores.aq={total:s,max:10,items:Array.from({length:10},(_,k)=>{const r=document.querySelector('input[name="aq'+k+'"]:checked');return r?+r.value:null;})};
+  }
+  return scores;
+}
+
+function submitForm(){
+  const motivo=getMotivo();
+  const antec=getMulti('antec'),vasculares=getMulti('vasculares'),familiares=getMulti('familiares');
+  const nombre=document.getElementById('nombre').value.trim()||'Paciente';
+  const horario=document.getElementById('horario').value||'';
+  const estudios=getSingle('estudios');
+  const preguntas=document.getElementById('preguntas').value.trim();
+  const meds=getMeds();
+  const cef=motivo==='cefalea'?getCefHipotesis():null;
+  const scores=collectScores(motivo);
+  const now=new Date();
+  const hora=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+
+  const phq8=document.querySelector('input[name="phq8"]:checked');
+  const ideacion=phq8&&+phq8.value>=1;
+  const auraMotora=cef&&(cef.aura||[]).includes('Debilidad unilateral ⚠');
+
+  const payload={
+    nombre,horario,estudios,preguntas,motivo,meds,antec,vasculares,familiares,
+    scores,cef,hora,ideacion,auraMotora
+  };
+
+  // ── Guardar en Firebase ──
+  const btn = document.querySelector('.btn-next.green');
+  if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
+
+  const db = firebase.database();
+  const ref = db.ref('formularios').push();
+  payload.id = ref.key;
+  payload.timestamp = Date.now();
+
+  ref.set(payload)
+    .then(()=>{
+      // Guardar también el id localmente para que el dashboard pueda filtrar si está en el mismo equipo
+      try{ localStorage.setItem('preconsulta_last_id', ref.key); }catch(e){}
+      document.getElementById('s'+cur).classList.remove('active');
+      document.getElementById('s-sent').style.display='block';
+      document.querySelector('.prog-wrap').style.display='none';
+      window.scrollTo(0,0);
+    })
+    .catch(err=>{
+      if(btn){ btn.disabled=false; btn.textContent='Enviar formulario →'; }
+      alert('Error al enviar. Verifique su conexión a internet e intente nuevamente.\n\n'+err.message);
+    });
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  initOpts('estudios',false);
+  initOpts('antec',true);
+  initOpts('vasculares',true);
+  initOpts('familiares',true);
+  initOpts('motivos',false);
+  initOpts('usamed',false);
+  document.getElementById('usamed').querySelectorAll('.opt-item').forEach(el=>{
+    el.addEventListener('click',()=>document.getElementById('meds-block').classList.toggle('show',el.dataset.v==='Si'));
+  });
+  ['cef-tiempo','cef-frec','cef-dur','cef-loc','cef-tipo','cef-int','cef-analg'].forEach(id=>initOpts(id,false));
+  ['cef-sint','cef-aura'].forEach(id=>initOpts(id,true));
+});
+</script>
+</body>
+</html>

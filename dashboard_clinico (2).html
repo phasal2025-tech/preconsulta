@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Clínico — Pre-Consulta</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0d2b4a;--navy-mid:#1a3a5c;
+  --blue:#185fa5;--blue-light:#E6F1FB;--blue-mid:#B5D4F4;--blue-dark:#0C447C;
+  --green-light:#EAF3DE;--green:#27500A;
+  --amber-light:#FAEEDA;--amber:#633806;--amber-border:#FAC775;
+  --red-light:#FCEBEB;--red:#791F1F;--red-border:#F09595;--red-mid:#A32D2D;
+  --coral-light:#FAECE7;--coral:#712B13;
+  --purple-light:#EEEDFE;--purple:#3C3489;--purple-border:#AFA9EC;
+  --gray-0:#fafafa;--gray-1:#f5f4f0;--gray-2:#e8e7e3;--gray-3:#d3d1c7;
+  --gray-4:#888780;--gray-5:#5f5e5a;--gray-6:#1a1a18;
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--gray-1);color:var(--gray-6);min-height:100vh;padding:2rem 1rem}
+.page{max-width:760px;margin:0 auto}
+
+/* ═══ LOGIN ═══ */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+.login-box{background:white;border-radius:var(--radius-lg);border:.5px solid var(--gray-2);padding:2.5rem 2rem;width:100%;max-width:400px;text-align:center}
+.login-logo{width:52px;height:52px;background:var(--navy);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem}
+.login-title{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--navy);margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--gray-5);margin-bottom:1.75rem;line-height:1.55}
+.login-label{font-size:12px;font-weight:600;color:var(--gray-5);text-transform:uppercase;letter-spacing:.05em;text-align:left;display:block;margin-bottom:6px}
+.login-input{width:100%;border:1.5px solid var(--gray-2);border-radius:var(--radius-sm);padding:11px 14px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--gray-6);letter-spacing:.08em;transition:border-color .2s}
+.login-input:focus{outline:none;border-color:var(--blue)}
+.login-btn{width:100%;margin-top:1rem;padding:13px;background:var(--navy);color:white;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s}
+.login-btn:hover{background:var(--blue-dark)}
+.login-err{display:none;margin-top:.75rem;font-size:13px;color:var(--red-mid);background:var(--red-light);border-radius:6px;padding:8px 12px}
+.login-notice{margin-top:1.25rem;font-size:11.5px;color:var(--gray-4);line-height:1.6}
+
+/* ═══ DASHBOARD ═══ */
+.dash-wrap{display:none}
+.page-header{background:var(--navy);color:white;border-radius:var(--radius-lg);padding:1.5rem 1.75rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.ph-left{display:flex;align-items:center;gap:14px}
+.avatar{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;color:white;flex-shrink:0;border:1.5px solid rgba(255,255,255,.25)}
+.ph-name{font-family:'DM Serif Display',serif;font-size:1.3rem;font-weight:400;line-height:1.2}
+.ph-meta{font-size:12px;opacity:.6;margin-top:3px}
+.ph-right{text-align:right;flex-shrink:0}
+.ph-time{font-size:11px;opacity:.5;margin-bottom:3px}
+.ph-stamp{font-size:13px;font-weight:500}
+.print-btn{margin-top:8px;padding:6px 14px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.2);border-radius:var(--radius-sm);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-left:6px}
+.print-btn:hover{background:rgba(255,255,255,.2)}
+.alert{display:flex;align-items:flex-start;gap:10px;padding:.85rem 1.1rem;border-radius:var(--radius-sm);margin-bottom:1rem;border-left:3px solid;font-size:13px;line-height:1.6}
+.alert-danger{background:var(--red-light);border-color:var(--red-mid);color:var(--red)}
+.alert-warn{background:var(--amber-light);border-color:var(--amber-border);color:var(--amber)}
+.alert svg{flex-shrink:0;margin-top:1px}
+.card{background:white;border:.5px solid var(--gray-2);border-radius:var(--radius-md);padding:1.25rem 1.5rem;margin-bottom:1rem}
+.card-title{font-size:10.5px;font-weight:600;color:var(--gray-4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem;padding-bottom:.6rem;border-bottom:.5px solid var(--gray-2);display:flex;align-items:center;gap:6px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+@media(max-width:560px){.info-grid{grid-template-columns:1fr}}
+.info-lbl{font-size:10.5px;font-weight:600;color:var(--gray-4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.45rem}
+.info-val{font-size:13.5px;color:var(--gray-6);line-height:1.55}
+.tag{display:inline-block;border-radius:6px;padding:3px 9px;font-size:12px;margin:2px 2px 2px 0}
+.tag-gray{background:var(--gray-1);color:var(--gray-5);border:.5px solid var(--gray-2)}
+.tag-blue{background:var(--blue-light);color:var(--blue-dark)}
+.tag-red{background:var(--red-light);color:var(--red-mid)}
+.motivo-parrafo{font-size:13.5px;color:var(--gray-6);line-height:1.75;margin-bottom:1rem}
+.quote-block{border-left:3px solid var(--blue-mid);padding:.6rem .9rem;font-size:13px;color:var(--gray-6);line-height:1.65;font-style:italic;border-radius:0;margin-top:.75rem;background:var(--blue-light)}
+.scale-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:.6rem}
+.scale-big{font-size:40px;font-weight:300;color:var(--gray-6);line-height:1}
+.scale-denom{font-size:14px;color:var(--gray-4);margin-left:3px}
+.scale-pill{display:inline-block;padding:3px 12px;border-radius:20px;font-size:12px;font-weight:500}
+.pill-sev{background:var(--red-light);color:var(--red)}
+.pill-mod{background:var(--coral-light);color:var(--coral)}
+.pill-modgrave{background:#FAECE7;color:#712B13}
+.pill-mild{background:var(--amber-light);color:var(--amber)}
+.pill-none{background:var(--green-light);color:var(--green)}
+.bar-track{height:6px;background:var(--gray-2);border-radius:3px;overflow:hidden;margin:.35rem 0 .3rem}
+.bar-fill{height:6px;border-radius:3px}
+.bar-labels{display:flex;justify-content:space-between;font-size:10.5px;color:var(--gray-4);margin-bottom:.85rem}
+.dsm-box{background:var(--blue-light);border:.5px solid var(--blue-mid);border-radius:var(--radius-sm);padding:.8rem 1rem;font-size:12px;color:var(--blue-dark);line-height:1.65;margin-top:.85rem}
+.dsm-box strong{color:var(--navy-mid)}
+.dsm-box-amber{background:var(--amber-light);border-color:var(--amber-border);color:var(--amber)}
+.dsm-box-amber strong{color:var(--navy-mid)}
+.dsm-box-green{background:var(--green-light);border-color:#C0DD97;color:var(--green)}
+.dsm-box-purple{background:var(--purple-light);border-color:var(--purple-border);color:var(--purple)}
+.chart-wrap{position:relative;width:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:.75rem;font-size:11.5px;color:var(--gray-5)}
+.legend-dot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
+.row-t{width:100%;border-collapse:collapse;font-size:13px}
+.row-t tr{border-bottom:.5px solid var(--gray-2)}
+.row-t tr:last-child{border-bottom:none}
+.row-t td{padding:7px 0;vertical-align:top}
+.row-t td:first-child{color:var(--gray-5);width:50%;padding-right:12px}
+.row-t td:last-child{color:var(--gray-6);font-weight:500;text-align:right}
+.section-sep{height:.5px;background:var(--gray-2);margin:1rem 0}
+.foot{font-size:11.5px;color:var(--gray-4);text-align:center;padding:1rem;line-height:1.6;margin-top:.5rem}
+/* Sin datos */
+.no-data{text-align:center;padding:2.5rem;color:var(--gray-4);font-size:13px}
+.no-data strong{display:block;font-size:15px;color:var(--gray-5);margin-bottom:6px}
+@media print{
+  body{background:white;padding:0}
+  .print-btn,.dash-actions{display:none}
+  .card{break-inside:avoid}
+  .login-wrap{display:none}
+}
+</style>
+<!-- ══ FIREBASE CONFIG — reemplace con sus propios valores ══ -->
+<script>
+  // MISMO CONFIG QUE EN EL FORMULARIO
+  const FIREBASE_CONFIG = {
+    apiKey:            "AIzaSyBd3THcCXLPhukUU7n2MVGydqjHEYGsMMY",
+    authDomain:        "preconsulta-clinic.firebaseapp.com",
+    databaseURL:       "https://preconsulta-clinic-default-rtdb.firebaseio.com",
+    projectId:         "preconsulta-clinic",
+    storageBucket:     "preconsulta-clinic.firebasestorage.app",
+    messagingSenderId: "202970335277",
+    appId:             "1:202970335277:web:8e64c8ed2b7db3bc7610a4"
+  };
+</script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  firebase.initializeApp(FIREBASE_CONFIG);
+</script>
+</head>
+<body>
+
+<!-- ═══════════════════════ PANTALLA DE LOGIN ═══════════════════════ -->
+<div class="login-wrap" id="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="11" width="18" height="11" rx="2" stroke="white" stroke-width="1.6"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="12" cy="16" r="1.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="login-title">Dashboard Clínico</div>
+    <div class="login-sub">Acceso exclusivo para personal médico.<br>Ingrese la clave de acceso para continuar.</div>
+    <label class="login-label" for="pin-input">Clave de acceso</label>
+    <input class="login-input" id="pin-input" type="password" placeholder="••••••••" autocomplete="off" onkeydown="if(event.key==='Enter')checkPin()">
+    <button class="login-btn" onclick="checkPin()">Ingresar</button>
+    <div class="login-err" id="login-err">Clave incorrecta. Intente nuevamente.</div>
+    <div class="login-notice">Uso exclusivo del equipo de salud. El acceso queda registrado con fecha y hora.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ DASHBOARD ═══════════════════════ -->
+<div class="dash-wrap" id="dash-wrap">
+<div class="page">
+
+<div class="page-header">
+  <div class="ph-left">
+    <div class="avatar" id="d-avatar">?</div>
+    <div>
+      <div class="ph-name" id="d-nombre">Paciente</div>
+      <div class="ph-meta" id="d-meta">Pre-consulta completada</div>
+    </div>
+  </div>
+  <div class="ph-right">
+    <div class="ph-time">Enviado</div>
+    <div class="ph-stamp" id="d-hora">—</div>
+    <button class="print-btn" onclick="window.print()">Imprimir</button>
+    <button class="print-btn" onclick="cerrarSesion()">Cerrar sesión</button>
+    <span id="dash-actions"></span>
+  </div>
+</div>
+
+<!-- Alertas críticas -->
+<div id="d-alertas"></div>
+
+<!-- BLOQUE 1: PERFIL -->
+<div class="card">
+  <div class="card-title">
+    <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M3 14c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    Perfil del paciente
+  </div>
+  <div class="info-grid">
+    <div>
+      <div class="info-lbl">Escolaridad</div>
+      <div class="info-val" id="d-estudios">—</div>
+    </div>
+    <div>
+      <div class="info-lbl">Antecedentes</div>
+      <div class="info-val" id="d-antec">—</div>
+    </div>
+    <div>
+      <div class="info-lbl">Fármacos actuales</div>
+      <div class="info-val" id="d-meds">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- BLOQUE 2: MOTIVO -->
+<div class="card">
+  <div class="card-title">
+    <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><path d="M3 4h10M3 8h7M3 12h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    Motivo de consulta
+  </div>
+  <p class="motivo-parrafo" id="d-motivo-parrafo"></p>
+  <div class="quote-block" id="d-quote" style="display:none"></div>
+</div>
+
+<!-- BLOQUE 3: ESCALAS -->
+<div class="card" id="d-escalas-card" style="display:none">
+  <div class="card-title">
+    <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <span id="d-escala-titulo">Escala clínica</span>
+  </div>
+  <div class="scale-header">
+    <div>
+      <div style="font-size:12px;color:var(--gray-5);margin-bottom:4px">Puntaje total</div>
+      <span class="scale-big" id="d-score-val">—</span><span class="scale-denom" id="d-score-max"></span>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:12px;color:var(--gray-4);margin-bottom:5px">Clasificación</div>
+      <span class="scale-pill" id="d-score-pill">—</span>
+    </div>
+  </div>
+  <div class="bar-track"><div class="bar-fill" id="d-score-bar" style="width:0%"></div></div>
+  <div class="bar-labels" id="d-score-labels"></div>
+
+  <div class="chart-wrap" id="d-chart-wrap" style="height:295px;margin-bottom:.5rem;display:none">
+    <canvas id="mainChart"></canvas>
+  </div>
+  <div class="legend" id="d-legend" style="display:none"></div>
+
+  <div id="d-dsm-box" style="display:none"></div>
+
+  <div class="section-sep"></div>
+  <div id="d-ref-table"></div>
+</div>
+
+<!-- BLOQUE 4: CEFALEA -->
+<div class="card" id="d-cef-card" style="display:none">
+  <div class="card-title">
+    <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    Perfil de cefalea — hipótesis ICHD-3
+  </div>
+  <div id="d-cef-content"></div>
+</div>
+
+<div class="foot">
+  Instrumento de apoyo para la consulta médica. Puntajes orientativos — no reemplazan la evaluación clínica ni el diagnóstico profesional. Información confidencial.
+</div>
+
+</div>
+</div><!-- /dash-wrap -->
+
+<script>
+// ═══════════════════════════════════════════════
+//  CONFIGURACIÓN — CAMBIAR CLAVE AQUÍ
+// ═══════════════════════════════════════════════
+const ACCESS_PIN = 'neuro2024';
+
+// ═══════════════════════════════════════════════
+//  LOGIN
+// ═══════════════════════════════════════════════
+function checkPin(){
+  const val = document.getElementById('pin-input').value;
+  if(val === ACCESS_PIN){
+    document.getElementById('login-err').style.display='none';
+    document.getElementById('login-wrap').style.display='none';
+    document.getElementById('dash-wrap').style.display='block';
+    document.body.style.padding='2rem 1rem';
+    renderDashboard();
+  } else {
+    document.getElementById('login-err').style.display='block';
+    document.getElementById('pin-input').value='';
+    document.getElementById('pin-input').focus();
+  }
+}
+
+function cerrarSesion(){
+  document.getElementById('dash-wrap').style.display='none';
+  document.getElementById('login-wrap').style.display='flex';
+  document.getElementById('pin-input').value='';
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER DASHBOARD
+// ═══════════════════════════════════════════════
+const motivoLabel = {
+  cefalea:'Cefalea',insomnio:'Insomnio',tdah:'Atención / TDAH',tea:'Trastorno del Espectro Autista',
+  depresion:'Estado de ánimo bajo / Depresión',ansiedad:'Ansiedad',mareos:'Mareos / Vértigo',
+  memoria:'Problemas de memoria',seguimiento:'Seguimiento / control de medicación'
+};
+
+// ── Estado de escucha Firebase ──
+let firebaseListener = null;
+let chartInstance = null;
+
+function showLoading(){
+  document.querySelector('.page').innerHTML = `
+    <div class="card" style="margin-top:2rem">
+      <div class="no-data">
+        <div style="margin-bottom:12px">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="animation:spin 1s linear infinite">
+            <circle cx="12" cy="12" r="10" stroke="#d3d1c7" stroke-width="2"/>
+            <path d="M12 2a10 10 0 0 1 10 10" stroke="#185fa5" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <strong>Esperando formulario del paciente…</strong>
+        El dashboard se actualizará automáticamente cuando el paciente envíe el formulario.
+      </div>
+    </div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}.no-data svg{display:block;margin:0 auto}</style>`;
+}
+
+function renderDashboard(){
+  showLoading();
+  const db = firebase.database();
+
+  // Escuchar el último formulario enviado en tiempo real
+  if(firebaseListener) firebaseListener.off();
+  firebaseListener = db.ref('formularios').orderByChild('timestamp').limitToLast(1);
+
+  firebaseListener.on('value', snap => {
+    let d = null;
+    snap.forEach(child => { d = child.val(); });
+
+    if(!d){
+      showLoading();
+      return;
+    }
+    buildUI(d);
+  });
+}
+
+function buildUI(d){
+
+  // Header
+  const initials = d.nombre.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('d-avatar').textContent = initials;
+  document.getElementById('d-nombre').textContent = d.nombre;
+  const motivoTxt = motivoLabel[d.motivo]||d.motivo||'No especificado';
+  document.getElementById('d-meta').textContent = [d.horario?'Consulta '+d.horario:'', motivoTxt].filter(Boolean).join(' · ');
+  document.getElementById('d-hora').textContent = d.hora||'—';
+
+  // Alertas
+  const alertas = [];
+  if(d.ideacion) alertas.push({t:'<strong>Alerta clínica — Ítem PHQ-9 (ideación) puntaje ≥ 1.</strong> Evaluar y explorar activamente el riesgo antes de abordar otros motivos de consulta.',c:'alert-danger'});
+  if(d.auraMotora) alertas.push({t:'<strong>⚠ Aura motora referida.</strong> Descartar ACV / AIT en consulta.',c:'alert-danger'});
+  if(alertas.length){
+    document.getElementById('d-alertas').innerHTML = alertas.map(a=>`
+      <div class="alert ${a.c}">
+        <svg width="17" height="17" fill="none" viewBox="0 0 16 16"><path d="M8 2L1.5 13.5h13L8 2z" stroke="#A32D2D" stroke-width="1.5"/><path d="M8 7v3" stroke="#A32D2D" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="11.8" r=".9" fill="#A32D2D"/></svg>
+        <div>${a.t}</div>
+      </div>`).join('');
+  }
+
+  // Perfil
+  document.getElementById('d-estudios').textContent = d.estudios||'No indicado';
+  const allAntec = [...(d.antec||[]),...(d.vasculares||[]),...(d.familiares||[])].filter(v=>!['Ninguna','Ninguno','Ninguno familiar'].includes(v));
+  document.getElementById('d-antec').innerHTML = allAntec.length
+    ? allAntec.map(a=>`<span class="tag tag-gray">${a}</span>`).join('')
+    : '<span style="color:var(--gray-4);font-size:12px">Sin antecedentes relevantes</span>';
+  document.getElementById('d-meds').innerHTML = (d.meds&&d.meds.length)
+    ? d.meds.map(m=>`<span class="tag tag-blue">${m}</span>`).join('')
+    : '<span style="color:var(--gray-4);font-size:12px">No refiere medicamentos</span>';
+
+  // Motivo
+  const mLabel = motivoLabel[d.motivo]||d.motivo||'No especificado';
+  const estudiosLine = d.estudios?`, con escolaridad de nivel ${d.estudios.toLowerCase()},`:'';
+  const medsLine = (d.meds&&d.meds.length)?` Toma actualmente: ${d.meds.join(', ')}.`:'';
+  const antecLine = allAntec.length?` Antecedentes: ${allAntec.join(', ')}.`:' Sin antecedentes relevantes reportados.';
+  document.getElementById('d-motivo-parrafo').innerHTML =
+    `El/la paciente${estudiosLine} consulta por <strong>${mLabel.toLowerCase()}</strong>.${antecLine}${medsLine}`;
+  if(d.preguntas){
+    document.getElementById('d-quote').style.display='';
+    document.getElementById('d-quote').textContent='"'+d.preguntas+'"';
+  }
+
+  // Escalas
+  const s = d.scores||{};
+  if(s.phq){ renderEscala('PHQ-9 — Depresión',s.phq.total,s.phq.max,s.phq.label,s.phq.cls,s.phq.items,'phq'); }
+  else if(s.isi){ renderEscala('ISI — Severidad del Insomnio',s.isi.total,s.isi.max,s.isi.label,s.isi.cls,s.isi.items,'isi'); }
+  else if(s.gad){ renderEscala('GAD-7 — Ansiedad',s.gad.total,s.gad.max,s.gad.label,s.gad.cls,s.gad.items,'gad'); }
+  else if(s.asrs){ renderAsrs(s.asrs); }
+  else if(s.aq){ renderAq(s.aq); }
+
+  // Cefalea
+  if(d.cef&&d.motivo==='cefalea'){ renderCefalea(d.cef); }
+
+  // Botón "Paciente siguiente" para limpiar
+  const actionsDiv = document.getElementById('dash-actions');
+  if(actionsDiv){
+    actionsDiv.innerHTML = `<button class="print-btn" onclick="borrarFormulario()" style="background:rgba(255,255,255,.08);margin-left:0">
+      Siguiente paciente ×
+    </button>`;
+  }
+}
+
+function borrarFormulario(){
+  if(!confirm('¿Confirma que terminó con este formulario y desea cargarlo para el próximo paciente?')) return;
+  const db = firebase.database();
+  db.ref('formularios').orderByChild('timestamp').limitToLast(1).once('value', snap => {
+    snap.forEach(child => { db.ref('formularios/'+child.key).remove(); });
+  });
+}
+
+// ——— Escala genérica ———
+function pillClass(cls){
+  const map={'score-none':'pill-none','score-mild':'pill-mild','score-mod':'pill-mod','score-sev':'pill-sev'};
+  return map[cls]||'pill-none';
+}
+
+function renderEscala(titulo,total,max,label,cls,items,prefix){
+  document.getElementById('d-escalas-card').style.display='';
+  document.getElementById('d-escala-titulo').textContent=titulo;
+  document.getElementById('d-score-val').textContent=total;
+  document.getElementById('d-score-max').textContent='/'+max;
+  const pill=document.getElementById('d-score-pill');
+  pill.textContent=label;pill.className='scale-pill '+pillClass(cls);
+  document.getElementById('d-score-bar').style.width=Math.round((total/max)*100)+'%';
+  const barColor = {'pill-none':'#639922','pill-mild':'#EF9F27','pill-mod':'#D85A30','pill-sev':'#A32D2D'}[pillClass(cls)]||'#185fa5';
+  document.getElementById('d-score-bar').style.background=barColor;
+
+  if(prefix==='phq'){
+    renderPHQ(total,items,barColor);
+  } else if(prefix==='isi'){
+    renderISI(total,items,barColor);
+  } else if(prefix==='gad'){
+    renderGAD(total,items,barColor);
+  }
+}
+
+function renderPHQ(total,items,barColor){
+  document.getElementById('d-score-labels').innerHTML='<span>0 Sin depresión</span><span>5 Leve</span><span>10 Mod.</span><span>15 Mod-grave</span><span>27</span>';
+  document.getElementById('d-chart-wrap').style.display='';
+  document.getElementById('d-legend').style.display='';
+  document.getElementById('d-legend').innerHTML=`
+    <span><span class="legend-dot" style="background:#639922"></span>Leve (1)</span>
+    <span><span class="legend-dot" style="background:#EF9F27"></span>Moderado (2)</span>
+    <span><span class="legend-dot" style="background:#D85A30"></span>Grave (3)</span>
+    <span><span class="legend-dot" style="background:#A32D2D"></span>Ítem 9 — Ideación ⚠</span>`;
+  const labels=['Anhedonia','Ánimo deprimido','Alteraciones del sueño','Fatiga / energía baja','Apetito / peso','Culpa / inutilidad','Concentración','Psicomotor','Ideación ⚠'];
+  const vals=items||[];
+  const colors=vals.map((v,i)=>{if(i===8)return'#A32D2D';if(v===3)return'#D85A30';if(v===2)return'#EF9F27';return'#639922';});
+  const tCol='rgba(0,0,0,0.42)',gCol='rgba(0,0,0,0.06)';
+  new Chart(document.getElementById('mainChart'),{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:colors,borderWidth:0,borderRadius:5,barThickness:18}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'  '+ctx.parsed.x+' / 3',afterLabel:ctx=>'  '+['Nunca','Varios días','Más de la mitad','Casi siempre'][ctx.parsed.x]}}},scales:{x:{min:0,max:3,ticks:{stepSize:1,color:tCol,font:{size:11}},grid:{color:gCol},border:{display:false}},y:{ticks:{color:tCol,font:{size:12}},grid:{display:false},border:{display:false}}},layout:{padding:{right:8,top:4}}}});
+
+  // DSM-5 box
+  const positivos=vals.filter(v=>v>0).length;
+  const nucleares=(vals[0]||0)>0&&(vals[1]||0)>0;
+  document.getElementById('d-dsm-box').style.display='';
+  document.getElementById('d-dsm-box').innerHTML=`<div class="dsm-box"><strong>Correlación DSM-5 — Episodio Depresivo Mayor (296.2x):</strong> El PHQ-9 mapea directamente los 9 síntomas del criterio A. El/la paciente puntúa positivo en <strong>${positivos} de 9 ítems</strong>${nucleares?', incluyendo ambos síntomas nucleares (ánimo deprimido y anhedonia)':''}.${(vals[8]||0)>=1?'<strong> El ítem 9 positivo (ideación) requiere evaluación de riesgo inmediata independientemente del puntaje total.</strong>':''}</div>`;
+  document.getElementById('d-ref-table').innerHTML=`
+    <div style="font-size:11px;color:var(--gray-4);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.65rem">Rangos de referencia PHQ-9</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <tr style="background:var(--gray-1)"><th style="padding:5px 8px;text-align:left;font-weight:500;color:var(--gray-5);border:.5px solid var(--gray-2)">Puntaje</th><th style="padding:5px 8px;text-align:left;font-weight:500;color:var(--gray-5);border:.5px solid var(--gray-2)">Severidad</th><th style="padding:5px 8px;text-align:left;font-weight:500;color:var(--gray-5);border:.5px solid var(--gray-2)">Correlación DSM-5</th></tr>
+      <tr><td style="padding:5px 8px;border:.5px solid var(--gray-2)">0–4</td><td style="padding:5px 8px;border:.5px solid var(--gray-2)"><span class="scale-pill pill-none" style="font-size:11px;padding:2px 8px">Sin depresión</span></td><td style="padding:5px 8px;border:.5px solid var(--gray-2);color:var(--gray-5)">No cumple criterios A</td></tr>
+      <tr><td style="padding:5px 8px;border:.5px solid var(--gray-2)">5–9</td><td style="padding:5px 8px;border:.5px solid var(--gray-2)"><span class="scale-pill pill-mild" style="font-size:11px;padding:2px 8px">Leve</span></td><td style="padding:5px 8px;border:.5px solid var(--gray-2);color:var(--gray-5)">Posible depresión menor o distimia</td></tr>
+      <tr><td style="padding:5px 8px;border:.5px solid var(--gray-2)">10–14</td><td style="padding:5px 8px;border:.5px solid var(--gray-2)"><span class="scale-pill pill-mod" style="font-size:11px;padding:2px 8px">Moderada</span></td><td style="padding:5px 8px;border:.5px solid var(--gray-2);color:var(--gray-5)">Compatible con TDM moderado</td></tr>
+      <tr><td style="padding:5px 8px;border:.5px solid var(--gray-2)">15–19</td><td style="padding:5px 8px;border:.5px solid var(--gray-2)"><span class="scale-pill pill-modgrave" style="font-size:11px;padding:2px 8px">Mod-grave</span></td><td style="padding:5px 8px;border:.5px solid var(--gray-2);color:var(--gray-5)">TDM moderado-grave — revisar plan</td></tr>
+      <tr><td style="padding:5px 8px;border:.5px solid var(--gray-2)">20–27</td><td style="padding:5px 8px;border:.5px solid var(--gray-2)"><span class="scale-pill pill-sev" style="font-size:11px;padding:2px 8px">Grave</span></td><td style="padding:5px 8px;border:.5px solid var(--gray-2);color:var(--gray-5)">TDM grave — acción urgente</td></tr>
+    </table>
+    <div style="margin-top:.5rem;font-size:11px;color:var(--gray-4)">Kroenke &amp; Spitzer, 2002. Sensibilidad 88% · Especificidad 88% para corte ≥10.</div>`;
+}
+
+function renderISI(total,items,barColor){
+  document.getElementById('d-score-labels').innerHTML='<span>0 Sin insomnio</span><span>7 Subclínico</span><span>14 Moderado</span><span>21 Grave</span><span>28</span>';
+  const labels=['Conciliar sueño','Mantener sueño','Despertar temprano','Satisfacción sueño','Interferencia diaria','Notado por otros','Preocupación'];
+  renderBarChart(labels,items||[],[]);
+  document.getElementById('d-ref-table').innerHTML=`<div style="font-size:11px;color:var(--gray-4)">Bastien et al., 2001. Punto de corte ≥8 indica insomnio clínicamente significativo. Escala: 0–7 sin insomnio · 8–14 subclínico · 15–21 moderado · 22–28 grave.</div>`;
+}
+
+function renderGAD(total,items,barColor){
+  document.getElementById('d-score-labels').innerHTML='<span>0 Mínima</span><span>5 Leve</span><span>10 Moderada</span><span>15 Grave</span><span>21</span>';
+  const labels=['Nervioso/al límite','No controlar preocupaciones','Preocupación excesiva','Dificultad para relajarse','Inquieto/no quieto','Irritarse fácilmente','Miedo a que algo terrible pase'];
+  renderBarChart(labels,items||[],[]);
+  document.getElementById('d-ref-table').innerHTML=`<div style="font-size:11px;color:var(--gray-4)">Spitzer et al., 2006. Punto de corte ≥10 para ansiedad moderada-grave. Escala: 0–4 mínima · 5–9 leve · 10–14 moderada · 15–21 grave.</div>`;
+}
+
+function renderBarChart(labels,vals,ignored){
+  document.getElementById('d-chart-wrap').style.display='';
+  const colors=vals.map(v=>v===3?'#D85A30':v===2?'#EF9F27':v===1?'#639922':'#e8e7e3');
+  const tCol='rgba(0,0,0,0.42)',gCol='rgba(0,0,0,0.06)';
+  new Chart(document.getElementById('mainChart'),{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:colors,borderWidth:0,borderRadius:5,barThickness:16}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{min:0,max:vals.some(v=>v>3)?4:3,ticks:{stepSize:1,color:tCol,font:{size:11}},grid:{color:gCol},border:{display:false}},y:{ticks:{color:tCol,font:{size:12}},grid:{display:false},border:{display:false}}},layout:{padding:{right:8,top:4}}}});
+}
+
+function renderAsrs(asrs){
+  document.getElementById('d-escalas-card').style.display='';
+  document.getElementById('d-escala-titulo').textContent='ASRS-v1.1 — TDAH Adulto';
+  document.getElementById('d-score-val').textContent=asrs.partA;
+  document.getElementById('d-score-max').textContent='/24 (Parte A)';
+  const alta=asrs.partA>=14;
+  const pill=document.getElementById('d-score-pill');
+  pill.textContent=alta?'Alta probabilidad TDAH':'Baja probabilidad';
+  pill.className='scale-pill '+(alta?'pill-sev':'pill-none');
+  document.getElementById('d-score-bar').style.width=Math.round((asrs.partA/24)*100)+'%';
+  document.getElementById('d-score-bar').style.background=alta?'#A32D2D':'#639922';
+  document.getElementById('d-score-labels').innerHTML='<span>0</span><span>8</span><span>14 Umbral</span><span>24</span>';
+  document.getElementById('d-dsm-box').style.display='';
+  document.getElementById('d-dsm-box').innerHTML=`<div class="dsm-box-${alta?'amber':'green'} dsm-box"><strong>ASRS Parte B — ${asrs.partB}/48.</strong> Correlación DSM-5 (314.0x): La Parte A actúa como tamizaje; Parte B complementa la evaluación clínica. Un puntaje Parte A ≥14 tiene sensibilidad ~68% y especificidad ~99% para TDAH en adultos (Kessler et al., 2005).</div>`;
+  document.getElementById('d-ref-table').innerHTML=`<div style="font-size:11px;color:var(--gray-4)">Kessler et al., 2005. Parte A: corte ≥14 sugiere alta probabilidad. Parte B aporta contexto adicional — evaluar en conjunto con historia clínica.</div>`;
+}
+
+function renderAq(aq){
+  document.getElementById('d-escalas-card').style.display='';
+  document.getElementById('d-escala-titulo').textContent='AQ-10 — Espectro Autista';
+  document.getElementById('d-score-val').textContent=aq.total;
+  document.getElementById('d-score-max').textContent='/10';
+  const derivar=aq.total>=6;
+  const pill=document.getElementById('d-score-pill');
+  pill.textContent=derivar?'Derivación sugerida':'Bajo umbral de tamizaje';
+  pill.className='scale-pill '+(derivar?'pill-sev':'pill-none');
+  document.getElementById('d-score-bar').style.width=Math.round((aq.total/10)*100)+'%';
+  document.getElementById('d-score-bar').style.background=derivar?'#A32D2D':'#639922';
+  document.getElementById('d-score-labels').innerHTML='<span>0</span><span>3</span><span>6 Umbral</span><span>10</span>';
+  document.getElementById('d-dsm-box').style.display='';
+  document.getElementById('d-dsm-box').innerHTML=`<div class="dsm-box"><strong>Correlación DSM-5 (299.00 — TEA):</strong> El AQ-10 es un instrumento de tamizaje, no diagnóstico. Puntaje ≥6 sugiere derivación a evaluación especializada para diagnóstico formal según criterios DSM-5.</div>`;
+  document.getElementById('d-ref-table').innerHTML=`<div style="font-size:11px;color:var(--gray-4)">Baron-Cohen et al., 2010. Sensibilidad 88% · Especificidad 91% (corte ≥6).</div>`;
+}
+
+function renderCefalea(cef){
+  document.getElementById('d-cef-card').style.display='';
+  const cC={'red':'#FCEBEB','amber':'#FAEEDA','gray':'#f5f4f0'};
+  const cT={'red':'#791F1F','amber':'#633806','gray':'#1a1a18'};
+  const niv=cef.niv||'gray';
+  document.getElementById('d-cef-content').innerHTML=`
+    <div style="display:inline-block;padding:5px 14px;border-radius:20px;background:${cC[niv]};color:${cT[niv]};font-size:13px;font-weight:500;margin-bottom:8px">${cef.h||'Sin clasificación'}</div>
+    ${(cef.crit||[]).map(c=>`<div style="font-size:12px;color:var(--gray-5);padding:1px 0">· ${c}</div>`).join('')}
+    <div style="margin-top:10px;font-size:12px;color:var(--gray-4)">ICHD-3: Clasificación Internacional de Cefaleas. Hipótesis orientativa — confirmar con evaluación clínica.</div>`;
+}
+</script>
+</body>
+</html>
