@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administración — Literatura Clínica</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  const FIREBASE_CONFIG = {
+    apiKey:            "AIzaSyBd3THcCXLPhukUU7n2MVGydqjHEYGsMMY",
+    authDomain:        "preconsulta-clinic.firebaseapp.com",
+    databaseURL:       "https://preconsulta-clinic-default-rtdb.firebaseio.com",
+    projectId:         "preconsulta-clinic",
+    storageBucket:     "preconsulta-clinic.firebasestorage.app",
+    messagingSenderId: "202970335277",
+    appId:             "1:202970335277:web:8e64c8ed2b7db3bc7610a4"
+  };
+  firebase.initializeApp(FIREBASE_CONFIG);
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0d2b4a;--navy-mid:#1a3a5c;
+  --blue:#185fa5;--blue-light:#E6F1FB;--blue-mid:#B5D4F4;--blue-dark:#0C447C;
+  --green-light:#EAF3DE;--green:#27500A;--green-mid:#3B6D11;
+  --amber-light:#FAEEDA;--amber:#633806;--amber-border:#FAC775;
+  --red-light:#FCEBEB;--red:#791F1F;--red-mid:#A32D2D;
+  --gray-1:#f5f4f0;--gray-2:#e8e7e3;--gray-3:#d3d1c7;
+  --gray-4:#888780;--gray-5:#5f5e5a;--gray-6:#1a1a18;
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--gray-1);color:var(--gray-6);min-height:100vh;padding:2rem 1rem}
+.page{max-width:760px;margin:0 auto}
+.header{background:var(--navy);color:white;border-radius:var(--radius-lg);padding:1.5rem 1.75rem;margin-bottom:1.25rem}
+.header h1{font-family:'DM Serif Display',serif;font-size:1.4rem;font-weight:400;margin-bottom:4px}
+.header p{font-size:12px;opacity:.6}
+.card{background:white;border:.5px solid var(--gray-2);border-radius:var(--radius-md);padding:1.25rem 1.5rem;margin-bottom:1rem}
+.card-title{font-size:10.5px;font-weight:600;color:var(--gray-4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem;padding-bottom:.6rem;border-bottom:.5px solid var(--gray-2)}
+.motivo-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+@media(max-width:500px){.motivo-grid{grid-template-columns:1fr}}
+.motivo-card{border:.5px solid var(--gray-2);border-radius:var(--radius-sm);padding:.85rem 1rem;cursor:pointer;transition:border-color .15s}
+.motivo-card:hover{border-color:var(--blue-mid);background:var(--blue-light)}
+.motivo-card.active{border-color:var(--blue);background:var(--blue-light)}
+.motivo-name{font-size:13px;font-weight:500;color:var(--gray-6);margin-bottom:3px}
+.motivo-count{font-size:11px;color:var(--gray-4)}
+.motivo-count.has-docs{color:var(--green-mid);font-weight:500}
+.btn{padding:10px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all .15s}
+.btn-primary{background:var(--navy);color:white}
+.btn-primary:hover{background:var(--blue-dark)}
+.btn-primary:disabled{background:var(--gray-3);cursor:not-allowed}
+.btn-danger{background:var(--red-light);color:var(--red-mid);border:.5px solid var(--red-mid)}
+.btn-danger:hover{background:#F7C1C1}
+.btn-sm{padding:5px 12px;font-size:12px}
+.upload-area{border:1.5px dashed var(--gray-3);border-radius:var(--radius-sm);padding:1.5rem;text-align:center;cursor:pointer;transition:all .15s}
+.upload-area:hover,.upload-area.drag{border-color:var(--blue);background:var(--blue-light)}
+.upload-area p{font-size:13px;color:var(--gray-5);margin-bottom:6px}
+.upload-area small{font-size:11px;color:var(--gray-4)}
+.doc-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--gray-2)}
+.doc-row:last-child{border-bottom:none}
+.doc-icon{font-size:18px;flex-shrink:0}
+.doc-name{flex:1;font-size:13px;color:var(--gray-6)}
+.doc-meta{font-size:11px;color:var(--gray-4)}
+.status-msg{font-size:12.5px;padding:8px 12px;border-radius:6px;margin-top:.75rem}
+.status-ok{background:var(--green-light);color:var(--green)}
+.status-err{background:var(--red-light);color:var(--red-mid)}
+.status-info{background:var(--blue-light);color:var(--blue-dark)}
+.progress-bar{height:4px;background:var(--gray-2);border-radius:2px;margin-top:8px;overflow:hidden}
+.progress-fill{height:4px;background:var(--blue);border-radius:2px;transition:width .3s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{animation:spin 1s linear infinite;display:inline-block}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="header">
+  <h1>Administración — Literatura Clínica</h1>
+  <p>Suba documentos PDF o Word por categoría. El dashboard los usará para generar recomendaciones con IA.</p>
+</div>
+
+<!-- SELECCIÓN DE MOTIVO -->
+<div class="card">
+  <div class="card-title">1 — Seleccione la categoría</div>
+  <div class="motivo-grid" id="motivo-grid"></div>
+</div>
+
+<!-- SUBIR DOCUMENTOS -->
+<div class="card" id="upload-card" style="display:none">
+  <div class="card-title" id="upload-card-title">2 — Documentos: —</div>
+
+  <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()"
+    ondragover="event.preventDefault();this.classList.add('drag')"
+    ondragleave="this.classList.remove('drag')"
+    ondrop="handleDrop(event)">
+    <p>Haga clic o arrastre archivos aquí</p>
+    <small>PDF o Word (.docx) · Máximo 10 MB por archivo</small>
+  </div>
+  <input type="file" id="file-input" accept=".pdf,.docx" multiple style="display:none" onchange="handleFiles(this.files)">
+
+  <div id="progress-wrap" style="display:none">
+    <div class="status-msg status-info" id="progress-msg">Procesando…</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+  <div id="upload-status"></div>
+</div>
+
+<!-- DOCUMENTOS ACTUALES -->
+<div class="card" id="docs-card" style="display:none">
+  <div class="card-title" id="docs-card-title">Documentos guardados</div>
+  <div id="docs-list"></div>
+</div>
+
+</div>
+
+<script>
+const MOTIVOS = {
+  cefalea:    'Cefalea',
+  insomnio:   'Insomnio',
+  tdah:       'Atención / TDAH',
+  tea:        'Trastorno del Espectro Autista',
+  depresion:  'Estado de ánimo bajo / Depresión',
+  ansiedad:   'Ansiedad',
+  mareos:     'Mareos / Vértigo',
+  memoria:    'Problemas de memoria',
+  seguimiento:'Seguimiento / medicación'
+};
+
+let motivoActual = null;
+let docCounts = {};
+
+// Cargar conteos al iniciar
+async function init(){
+  const grid = document.getElementById('motivo-grid');
+  for(const [key, label] of Object.entries(MOTIVOS)){
+    try {
+      const snap = await firebase.database().ref('literatura/'+key).get();
+      docCounts[key] = snap.exists() ? Object.keys(snap.val()).length : 0;
+    } catch(e){ docCounts[key] = 0; }
+  }
+  renderGrid();
+}
+
+function renderGrid(){
+  const grid = document.getElementById('motivo-grid');
+  grid.innerHTML = Object.entries(MOTIVOS).map(([key, label]) => {
+    const n = docCounts[key]||0;
+    return `<div class="motivo-card${motivoActual===key?' active':''}" onclick="selMotivo('${key}')">
+      <div class="motivo-name">${label}</div>
+      <div class="motivo-count${n>0?' has-docs':''}">${n>0?n+' documento'+(n>1?'s':'')+' cargado'+(n>1?'s':''):'Sin documentos'}</div>
+    </div>`;
+  }).join('');
+}
+
+function selMotivo(key){
+  motivoActual = key;
+  renderGrid();
+  document.getElementById('upload-card').style.display = '';
+  document.getElementById('upload-card-title').textContent = '2 — Documentos: '+MOTIVOS[key];
+  document.getElementById('upload-status').innerHTML = '';
+  document.getElementById('progress-wrap').style.display = 'none';
+  cargarDocsActuales(key);
+}
+
+async function cargarDocsActuales(key){
+  const card = document.getElementById('docs-card');
+  const list = document.getElementById('docs-list');
+  const title = document.getElementById('docs-card-title');
+  card.style.display = '';
+  title.textContent = 'Documentos guardados — '+MOTIVOS[key];
+  list.innerHTML = '<div style="font-size:13px;color:var(--gray-4);padding:.5rem 0">Cargando…</div>';
+  try {
+    const snap = await firebase.database().ref('literatura/'+key).get();
+    if(!snap.exists()){ list.innerHTML='<div style="font-size:13px;color:var(--gray-4);padding:.5rem 0">No hay documentos aún.</div>'; return; }
+    const docs = [];
+    snap.forEach(child=>docs.push({_key:child.key,...child.val()}));
+    list.innerHTML = docs.map(doc=>`
+      <div class="doc-row">
+        <div class="doc-icon">${doc.tipo==='pdf'?'📄':'📝'}</div>
+        <div>
+          <div class="doc-name">${doc.nombre}</div>
+          <div class="doc-meta">${doc.tipo?.toUpperCase()||'DOC'} · ${doc.chars||0} caracteres · ${doc.fecha||'—'}</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="eliminarDoc('${key}','${doc._key}','${doc.nombre.replace(/'/g,"\\'")}')">Eliminar</button>
+      </div>`).join('');
+  } catch(e){
+    list.innerHTML=`<div style="font-size:13px;color:var(--red-mid)">Error: ${e.message}</div>`;
+  }
+}
+
+async function eliminarDoc(motivo, key, nombre){
+  if(!confirm('¿Eliminar "'+nombre+'"?')) return;
+  await firebase.database().ref('literatura/'+motivo+'/'+key).remove();
+  docCounts[motivo] = Math.max(0,(docCounts[motivo]||1)-1);
+  renderGrid();
+  cargarDocsActuales(motivo);
+}
+
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('upload-area').classList.remove('drag');
+  handleFiles(e.dataTransfer.files);
+}
+
+async function handleFiles(files){
+  if(!motivoActual){ alert('Seleccione una categoría primero.'); return; }
+  const arr = Array.from(files).filter(f=>f.name.endsWith('.pdf')||f.name.endsWith('.docx'));
+  if(arr.length===0){ showStatus('Solo se aceptan archivos PDF o Word (.docx).','err'); return; }
+
+  const progWrap = document.getElementById('progress-wrap');
+  const progMsg  = document.getElementById('progress-msg');
+  const progFill = document.getElementById('progress-fill');
+  progWrap.style.display = '';
+  document.getElementById('upload-status').innerHTML = '';
+
+  for(let i=0; i<arr.length; i++){
+    const file = arr[i];
+    progMsg.innerHTML = `<span class="spinner">⟳</span> Procesando ${i+1}/${arr.length}: ${file.name}`;
+    progFill.style.width = Math.round(((i)/arr.length)*100)+'%';
+
+    try {
+      // Extraer texto del archivo
+      let texto = '';
+      if(file.name.endsWith('.pdf')){
+        texto = await extraerTextoPDF(file);
+      } else {
+        texto = await extraerTextoDocx(file);
+      }
+
+      // Guardar en Firebase
+      const ref = firebase.database().ref('literatura/'+motivoActual).push();
+      await ref.set({
+        nombre: file.name,
+        tipo:   file.name.endsWith('.pdf')?'pdf':'docx',
+        texto:  texto.slice(0, 50000),
+        chars:  texto.length,
+        fecha:  new Date().toLocaleDateString('es-CL')
+      });
+      docCounts[motivoActual] = (docCounts[motivoActual]||0)+1;
+
+    } catch(e){
+      showStatus('Error con "'+file.name+'": '+e.message,'err');
+    }
+  }
+
+  progFill.style.width = '100%';
+  progMsg.innerHTML = '✓ Completado';
+  setTimeout(()=>{ progWrap.style.display='none'; },2000);
+  showStatus(arr.length+' documento'+(arr.length>1?'s':'')+' guardado'+(arr.length>1?'s':'')+' correctamente.','ok');
+  renderGrid();
+  cargarDocsActuales(motivoActual);
+  document.getElementById('file-input').value='';
+}
+
+// Extraer texto de PDF usando pdf.js
+async function extraerTextoPDF(file){
+  if(!window.pdfjsLib){
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await window.pdfjsLib.getDocument({data:arrayBuffer}).promise;
+  let texto = '';
+  for(let i=1;i<=Math.min(pdf.numPages,30);i++){
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    texto += content.items.map(item=>item.str).join(' ')+'\n';
+  }
+  return texto.trim();
+}
+
+// Extraer texto de DOCX usando mammoth
+async function extraerTextoDocx(file){
+  if(!window.mammoth){
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
+  }
+  const arrayBuffer = await file.arrayBuffer();
+  const result = await window.mammoth.extractRawText({arrayBuffer});
+  return result.value.trim();
+}
+
+function loadScript(src){
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src=src; s.onload=res; s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+
+function showStatus(msg, type){
+  document.getElementById('upload-status').innerHTML=`<div class="status-msg status-${type==='ok'?'ok':type==='err'?'err':'info'}">${msg}</div>`;
+}
+
+init();
+</script>
+</body>
+</html>
