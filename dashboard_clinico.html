@@ -133,10 +133,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-1);color:var(--gray-
     </div>
     <div class="login-title">Dashboard Clínico</div>
     <div class="login-sub">Acceso exclusivo para personal médico.<br>Ingrese la clave de acceso para continuar.</div>
+    <label class="login-label" for="prof-input">Nombre del profesional</label>
+    <input class="login-input" id="prof-input" type="text" placeholder="Ej: Dr. García" autocomplete="off" style="margin-bottom:.75rem">
     <label class="login-label" for="pin-input">Clave de acceso</label>
     <input class="login-input" id="pin-input" type="password" placeholder="••••••••" autocomplete="off" onkeydown="if(event.key==='Enter')checkPin()">
     <button class="login-btn" onclick="checkPin()">Ingresar</button>
-    <div class="login-err" id="login-err">Clave incorrecta. Intente nuevamente.</div>
+    <div class="login-err" id="login-err">Clave incorrecta o falta el nombre del profesional.</div>
     <div class="login-notice">Uso exclusivo del equipo de salud. El acceso queda registrado con fecha y hora.</div>
   </div>
 </div>
@@ -153,6 +155,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-1);color:var(--gray-
       <div>
         <div class="ph-name">Dashboard Clínico</div>
         <div class="ph-meta" id="lista-fecha">Pre-consultas del día</div>
+        <div class="ph-meta" style="opacity:.8;margin-top:2px">Prof: <span id="lista-prof-name" style="font-weight:500"></span></div>
       </div>
     </div>
     <div class="ph-right">
@@ -322,17 +325,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-1);color:var(--gray-
 const ACCESS_PIN = 'neuro2024';
 window._pacientes = [];
 window._chartInst = null;
+window._profesional = '';
 
 // ══ LOGIN ══
 function checkPin(){
-  const val = document.getElementById('pin-input').value;
-  if(val === ACCESS_PIN){
+  const val  = document.getElementById('pin-input').value;
+  const prof = document.getElementById('prof-input').value.trim();
+  if(val === ACCESS_PIN && prof.length > 0){
+    window._profesional = prof;
     document.getElementById('login-err').style.display = 'none';
     document.getElementById('login-wrap').style.display = 'none';
     document.getElementById('lista-wrap').style.display = 'block';
     document.body.style.padding = '2rem 1rem';
     const hoy = new Date().toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
     document.getElementById('lista-fecha').textContent = hoy.charAt(0).toUpperCase()+hoy.slice(1);
+    document.getElementById('lista-prof-name').textContent = prof;
     cargarPacientes();
   } else {
     document.getElementById('login-err').style.display = 'block';
@@ -346,7 +353,9 @@ function cerrarSesion(){
   document.getElementById('lista-wrap').style.display = 'none';
   document.getElementById('login-wrap').style.display = 'flex';
   document.getElementById('pin-input').value = '';
+  document.getElementById('prof-input').value = '';
   window._pacientes = [];
+  window._profesional = '';
   if(window._chartInst){ window._chartInst.destroy(); window._chartInst = null; }
 }
 
@@ -657,10 +666,11 @@ async function generarRecomendacionesIA(d){
   const refsList = document.getElementById('d-ia-refs-list');
   card.style.display = '';
 
-  // 1. Buscar documentos en Firebase para este motivo
+  // 1. Buscar documentos en Firebase para este motivo Y este profesional
   let docs = [];
   try {
-    const snap = await firebase.database().ref('literatura/'+(d.motivo||'general')).get();
+    const profKey = (window._profesional||'general').toLowerCase().replace(/[^a-z0-9]/g,'_');
+    const snap = await firebase.database().ref('literatura/'+profKey+'/'+(d.motivo||'general')).get();
     if(snap.exists()){ snap.forEach(child => { docs.push(child.val()); }); }
   } catch(e){ console.warn('Sin literatura:', e); }
 
