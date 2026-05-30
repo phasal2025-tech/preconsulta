@@ -282,6 +282,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-1);color:var(--gray-
   <div id="d-cef-content"></div>
 </div>
 
+<!-- BLOQUE 5: RECOMENDACIONES IA -->
+<div class="card" id="d-ia-card" style="display:none">
+  <div class="card-title">
+    <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2z" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    Recomendaciones clínicas — basadas en literatura
+  </div>
+  <div id="d-ia-content">
+    <div style="display:flex;align-items:center;gap:10px;padding:.5rem 0;color:var(--gray-4);font-size:13px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="animation:spin 1s linear infinite;flex-shrink:0"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" stroke-dasharray="28 56"/></svg>
+      Analizando literatura clínica para este paciente…
+    </div>
+  </div>
+  <div id="d-ia-refs" style="margin-top:.85rem;display:none">
+    <div style="font-size:10.5px;font-weight:600;color:var(--gray-4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem">Documentos consultados</div>
+    <div id="d-ia-refs-list"></div>
+  </div>
+</div>
+
+<style>
+@keyframes spin{to{transform:rotate(360deg)}}
+.ia-section{margin-bottom:1rem}
+.ia-section-title{font-size:12px;font-weight:600;color:var(--navy-mid);margin-bottom:.4rem;display:flex;align-items:center;gap:6px}
+.ia-section-title::before{content:'';width:3px;height:14px;background:var(--blue);border-radius:2px;display:inline-block}
+.ia-body{font-size:13px;color:var(--gray-6);line-height:1.75}
+.ia-ref-item{font-size:11.5px;color:var(--blue-dark);padding:3px 0;border-bottom:.5px solid var(--gray-2)}
+.ia-ref-item:last-child{border-bottom:none}
+.ia-empty{font-size:13px;color:var(--gray-4);padding:.5rem 0}
+</style>
+
 <div class="foot">
   Instrumento de apoyo para la consulta médica. Puntajes orientativos — no reemplazan la evaluación clínica ni el diagnóstico profesional. Información confidencial.
 </div>
@@ -490,6 +519,9 @@ function renderDashboard(d){
 
   // Cefalea
   if(d.cef&&d.motivo==='cefalea'){ renderCefalea(d.cef); }
+
+  // IA — recomendaciones basadas en literatura
+  generarRecomendacionesIA(d);
 }
 
 // ——— Escala genérica ———
@@ -615,6 +647,83 @@ function renderCefalea(cef){
     <div style="display:inline-block;padding:5px 14px;border-radius:20px;background:${cC[niv]};color:${cT[niv]};font-size:13px;font-weight:500;margin-bottom:8px">${cef.h||'Sin clasificación'}</div>
     ${(cef.crit||[]).map(c=>`<div style="font-size:12px;color:var(--gray-5);padding:1px 0">· ${c}</div>`).join('')}
     <div style="margin-top:10px;font-size:12px;color:var(--gray-4)">ICHD-3: Clasificación Internacional de Cefaleas. Hipótesis orientativa — confirmar con evaluación clínica.</div>`;
+}
+
+// ══ IA — RECOMENDACIONES BASADAS EN LITERATURA ══
+async function generarRecomendacionesIA(d){
+  const card = document.getElementById('d-ia-card');
+  const content = document.getElementById('d-ia-content');
+  const refsDiv = document.getElementById('d-ia-refs');
+  const refsList = document.getElementById('d-ia-refs-list');
+  card.style.display = '';
+
+  // 1. Buscar documentos en Firebase para este motivo
+  let docs = [];
+  try {
+    const snap = await firebase.database().ref('literatura/'+(d.motivo||'general')).get();
+    if(snap.exists()){ snap.forEach(child => { docs.push(child.val()); }); }
+  } catch(e){ console.warn('Sin literatura:', e); }
+
+  if(docs.length === 0){
+    content.innerHTML = `<div class="ia-empty">No hay documentos cargados para <strong>${motivoLabel[d.motivo]||d.motivo}</strong>.<br>Use la página de administración para sincronizar documentos desde Google Drive.</div>`;
+    return;
+  }
+
+  // Mostrar refs
+  refsDiv.style.display = '';
+  refsList.innerHTML = docs.map(doc=>`<div class="ia-ref-item">📄 ${doc.nombre}</div>`).join('');
+
+  // 2. Contexto del paciente
+  const s = d.scores||{};
+  let escalaResumen = '';
+  if(s.phq) escalaResumen=`PHQ-9: ${s.phq.total}/27 (${s.phq.label})`;
+  else if(s.isi) escalaResumen=`ISI: ${s.isi.total}/28 (${s.isi.label})`;
+  else if(s.gad) escalaResumen=`GAD-7: ${s.gad.total}/21 (${s.gad.label})`;
+  else if(s.asrs) escalaResumen=`ASRS Parte A: ${s.asrs.partA}/24`;
+  else if(s.aq) escalaResumen=`AQ-10: ${s.aq.total}/10`;
+  const allAntec2=[...(d.antec||[]),...(d.vasculares||[]),...(d.familiares||[])].filter(v=>!['Ninguna','Ninguno','Ninguno familiar'].includes(v));
+  const contexto=`Motivo: ${motivoLabel[d.motivo]||d.motivo}
+${escalaResumen?'Escala: '+escalaResumen:''}
+${allAntec2.length?'Antecedentes: '+allAntec2.join(', '):''}
+${(d.meds&&d.meds.length)?'Medicamentos: '+d.meds.join(', '):''}
+${d.preguntas?'Paciente dice: "'+d.preguntas+'"':''}
+${d.ideacion?'⚠ Ideación (PHQ-9 ítem 9 ≥1)':''}
+${d.auraMotora?'⚠ Aura motora referida':''}
+${d.cef?'Hipótesis cefalea: '+d.cef.h:''}`;
+
+  const literaturaTxt=docs.map(doc=>`--- ${doc.nombre} ---\n${(doc.texto||'').slice(0,3000)}`).join('\n\n');
+
+  // 3. Llamar Claude API
+  content.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:.5rem 0;color:var(--gray-4);font-size:13px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="animation:spin 1s linear infinite;flex-shrink:0"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" stroke-dasharray="28 56"/></svg>Generando recomendaciones con IA…</div>`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:`Eres un asistente clínico de apoyo. Recibirás datos de un paciente y extractos de literatura científica. Extrae y sintetiza las recomendaciones MÁS RELEVANTES para este caso específico. Responde SOLO en JSON sin markdown:
+{"secciones":[{"titulo":"...","contenido":"..."}],"advertencias":["..."]}
+Máximo 4 secciones. Sé específico al caso. Cita la fuente entre paréntesis cuando sea posible.`,
+        messages:[{role:'user',content:`PACIENTE:\n${contexto}\n\nLITERATURA:\n${literaturaTxt}`}]
+      })
+    });
+    const data=await resp.json();
+    const txt=(data.content||[]).map(c=>c.text||'').join('');
+    let parsed;
+    try{parsed=JSON.parse(txt.replace(/```json|```/g,''));}catch(e){throw new Error('Formato IA inválido');}
+    let html='';
+    (parsed.secciones||[]).forEach(sec=>{
+      html+=`<div class="ia-section"><div class="ia-section-title">${sec.titulo}</div><div class="ia-body">${sec.contenido}</div></div>`;
+    });
+    if((parsed.advertencias||[]).filter(Boolean).length){
+      html+=parsed.advertencias.filter(Boolean).map(a=>`<div class="alert alert-warn" style="margin-top:.5rem;font-size:12.5px">⚠ ${a}</div>`).join('');
+    }
+    content.innerHTML=html||'<div class="ia-empty">Sin recomendaciones específicas para este caso.</div>';
+  } catch(e){
+    content.innerHTML=`<div class="ia-empty">No se pudo generar el análisis. Error: ${e.message}</div>`;
+  }
 }
 </script>
 </body>
