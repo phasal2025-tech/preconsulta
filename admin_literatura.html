@@ -80,6 +80,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-1);color:var(--gray-
   <p>Suba documentos PDF o Word por categoría. El dashboard los usará para generar recomendaciones con IA.</p>
 </div>
 
+<!-- LOGIN PROFESIONAL -->
+<div class="card" id="login-card">
+  <div class="card-title">Identificación del profesional</div>
+  <p style="font-size:13px;color:var(--gray-5);margin-bottom:1rem">Sus documentos quedarán asociados a su nombre y solo se usarán cuando usted esté atendiendo.</p>
+  <input type="text" id="prof-name-input" placeholder="Ej: Dr. García" style="max-width:320px;border:1.5px solid var(--gray-2);border-radius:var(--radius-sm);padding:10px 13px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--gray-6);display:block;margin-bottom:.75rem">
+  <button class="btn btn-primary" onclick="iniciarAdmin()">Continuar</button>
+  <div id="login-admin-err" style="display:none;margin-top:.75rem;font-size:13px;color:var(--red-mid)">Por favor ingrese su nombre.</div>
+</div>
+
+<!-- CONTENIDO ADMIN (oculto hasta login) -->
+<div id="admin-content" style="display:none">
+
 <!-- SELECCIÓN DE MOTIVO -->
 <div class="card">
   <div class="card-title">1 — Seleccione la categoría</div>
@@ -112,6 +124,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-1);color:var(--gray-
   <div id="docs-list"></div>
 </div>
 
+</div><!-- /admin-content -->
+
 </div>
 
 <script>
@@ -129,13 +143,25 @@ const MOTIVOS = {
 
 let motivoActual = null;
 let docCounts = {};
+let profKey = '';
+let profNombre = '';
 
-// Cargar conteos al iniciar
+function iniciarAdmin(){
+  const nombre = document.getElementById('prof-name-input').value.trim();
+  if(!nombre){ document.getElementById('login-admin-err').style.display=''; return; }
+  profNombre = nombre;
+  profKey = nombre.toLowerCase().replace(/[^a-z0-9áéíóúñü]/g,'_');
+  document.getElementById('login-card').style.display = 'none';
+  document.getElementById('admin-content').style.display = 'block';
+  document.querySelector('.header p').textContent = `Profesional: ${profNombre} · Sus documentos son independientes de otros profesionales.`;
+  init();
+}
+
 async function init(){
   const grid = document.getElementById('motivo-grid');
-  for(const [key, label] of Object.entries(MOTIVOS)){
+  for(const [key] of Object.entries(MOTIVOS)){
     try {
-      const snap = await firebase.database().ref('literatura/'+key).get();
+      const snap = await firebase.database().ref('literatura/'+profKey+'/'+key).get();
       docCounts[key] = snap.exists() ? Object.keys(snap.val()).length : 0;
     } catch(e){ docCounts[key] = 0; }
   }
@@ -171,7 +197,7 @@ async function cargarDocsActuales(key){
   title.textContent = 'Documentos guardados — '+MOTIVOS[key];
   list.innerHTML = '<div style="font-size:13px;color:var(--gray-4);padding:.5rem 0">Cargando…</div>';
   try {
-    const snap = await firebase.database().ref('literatura/'+key).get();
+    const snap = await firebase.database().ref('literatura/'+profKey+'/'+key).get();
     if(!snap.exists()){ list.innerHTML='<div style="font-size:13px;color:var(--gray-4);padding:.5rem 0">No hay documentos aún.</div>'; return; }
     const docs = [];
     snap.forEach(child=>docs.push({_key:child.key,...child.val()}));
@@ -191,7 +217,7 @@ async function cargarDocsActuales(key){
 
 async function eliminarDoc(motivo, key, nombre){
   if(!confirm('¿Eliminar "'+nombre+'"?')) return;
-  await firebase.database().ref('literatura/'+motivo+'/'+key).remove();
+  await firebase.database().ref('literatura/'+profKey+'/'+motivo+'/'+key).remove();
   docCounts[motivo] = Math.max(0,(docCounts[motivo]||1)-1);
   renderGrid();
   cargarDocsActuales(motivo);
@@ -228,8 +254,8 @@ async function handleFiles(files){
         texto = await extraerTextoDocx(file);
       }
 
-      // Guardar en Firebase
-      const ref = firebase.database().ref('literatura/'+motivoActual).push();
+      // Guardar en Firebase bajo la clave del profesional
+      const ref = firebase.database().ref('literatura/'+profKey+'/'+motivoActual).push();
       await ref.set({
         nombre: file.name,
         tipo:   file.name.endsWith('.pdf')?'pdf':'docx',
@@ -292,7 +318,9 @@ function showStatus(msg, type){
   document.getElementById('upload-status').innerHTML=`<div class="status-msg status-${type==='ok'?'ok':type==='err'?'err':'info'}">${msg}</div>`;
 }
 
-init();
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('prof-name-input').addEventListener('keydown', e=>{ if(e.key==='Enter') iniciarAdmin(); });
+});
 </script>
 </body>
 </html>
