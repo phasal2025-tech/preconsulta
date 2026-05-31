@@ -4,77 +4,133 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Formulario Pre-Consulta — Neurología &amp; Salud Mental</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#1a1a18;min-height:100vh;padding:1.5rem 1rem}
+:root{
+  --navy:#0d2b4a;--navy-mid:#1a3a5c;
+  --blue:#185fa5;--blue-light:#E6F1FB;--blue-mid:#B5D4F4;--blue-dark:#0C447C;
+  --teal:#0f6e56;--teal-light:#EAF3DE;--teal-mid:#3B6D11;
+  --amber:#BA7517;--amber-light:#FAEEDA;--amber-border:#FAC775;
+  --red:#A32D2D;--red-light:#FCEBEB;
+  --gray-1:#f5f4f0;--gray-2:#e8e7e3;--gray-3:#d3d1c7;
+  --gray-4:#888780;--gray-5:#5f5e5a;--gray-6:#1a1a18;
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;
+}
+body{font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(160deg,#e8f0f8 0%,#f5f4f0 60%);color:var(--gray-6);min-height:100vh;padding:1.5rem 1rem}
 .app{max-width:680px;margin:0 auto}
-.app-header{background:#1a3a5c;color:white;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
-.app-header h1{font-size:1.2rem;font-weight:500;margin-bottom:4px}
-.app-header p{font-size:12px;opacity:.7}
-.prog-wrap{margin-bottom:1.25rem}
-.prog-label{font-size:12px;color:#5f5e5a;margin-bottom:6px;display:flex;justify-content:space-between}
-.prog-bar{height:4px;background:#e8e7e3;border-radius:2px}
-.prog-fill{height:4px;background:#185fa5;border-radius:2px;transition:width 0.4s ease}
-.card{background:white;border-radius:12px;border:0.5px solid rgba(0,0,0,0.1);padding:1.5rem;margin-bottom:1rem}
-.sec-badge{display:inline-block;font-size:11px;font-weight:500;background:#E6F1FB;color:#0C447C;padding:2px 8px;border-radius:20px;margin-bottom:8px}
-.sec-title{font-size:18px;font-weight:500;color:#1a3a5c;line-height:1.3;margin-bottom:4px}
-.sec-sub{font-size:13px;color:#5f5e5a;margin-bottom:1.25rem}
+
+/* HEADER */
+.app-header{background:linear-gradient(135deg,var(--navy) 0%,#1a4a7a 100%);color:white;border-radius:var(--radius-lg);padding:1.75rem 1.75rem 1.5rem;margin-bottom:1rem;position:relative;overflow:hidden}
+.app-header::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%}
+.app-header::after{content:'';position:absolute;bottom:-60px;right:20px;width:120px;height:120px;background:rgba(255,255,255,.04);border-radius:50%}
+.header-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.header-icon{width:44px;height:44px;background:rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,.2)}
+.app-header h1{font-size:1.25rem;font-weight:500;letter-spacing:-.01em}
+.app-header .subtitle{font-size:12px;opacity:.65;margin-top:2px}
+.header-benefit{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:1.55;opacity:.9;position:relative;z-index:1}
+.header-benefit strong{display:block;font-size:13px;margin-bottom:3px;opacity:1}
+
+/* PROGRESO */
+.prog-wrap{margin-bottom:1.25rem;background:white;border-radius:var(--radius-md);padding:.85rem 1.1rem;border:.5px solid var(--gray-2)}
+.prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.prog-name{font-size:13px;font-weight:500;color:var(--navy-mid)}
+.prog-count{font-size:12px;color:var(--gray-4);background:var(--gray-1);padding:2px 10px;border-radius:20px}
+.prog-bar{height:6px;background:var(--gray-2);border-radius:3px;overflow:hidden}
+.prog-fill{height:6px;background:linear-gradient(90deg,var(--blue),#4a9fd4);border-radius:3px;transition:width 0.5s ease}
+.prog-steps{display:flex;justify-content:space-between;margin-top:6px}
+.prog-step{font-size:10px;color:var(--gray-3);text-align:center;flex:1}
+.prog-step.done{color:var(--blue)}
+.prog-step.active{color:var(--navy-mid);font-weight:500}
+
+/* CARD */
+.card{background:white;border-radius:var(--radius-lg);border:.5px solid var(--gray-2);padding:1.5rem 1.6rem;margin-bottom:1rem;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.sec-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;background:var(--blue-light);color:var(--blue-dark);padding:3px 10px;border-radius:20px;margin-bottom:10px;letter-spacing:.03em}
+.sec-title{font-size:1.15rem;font-weight:500;color:var(--navy-mid);line-height:1.3;margin-bottom:6px}
+.sec-sub{font-size:13px;color:var(--gray-5);line-height:1.6;margin-bottom:1.25rem}
+
+/* TIP BOX */
+.tip-box{background:linear-gradient(135deg,#f0f7ff,#e8f4ff);border:1px solid var(--blue-mid);border-radius:10px;padding:11px 14px;margin-bottom:1.25rem;display:flex;gap:10px;align-items:flex-start}
+.tip-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.tip-text{font-size:12.5px;color:var(--blue-dark);line-height:1.6}
+.tip-text strong{display:block;font-size:13px;margin-bottom:2px}
+
+/* PREGUNTAS */
 .q{margin-bottom:1.25rem}
-.q-text{font-size:14px;color:#1a1a18;margin-bottom:10px;line-height:1.5}
-.q-text .req{color:#a32d2d}
-input[type=text],textarea,select{width:100%;border:1px solid #d3d1c7;border-radius:8px;padding:10px 12px;font-size:14px;color:#1a1a18;background:white;font-family:inherit;transition:border-color 0.2s}
-input[type=text]:focus,textarea:focus,select:focus{outline:none;border-color:#185fa5;box-shadow:0 0 0 3px rgba(24,95,165,0.1)}
+.q-text{font-size:14px;color:var(--gray-6);margin-bottom:10px;line-height:1.55;font-weight:500}
+.q-text .req{color:var(--red)}
+.q-hint{font-size:12px;color:var(--gray-4);margin-bottom:8px;font-weight:400}
+input[type=text],textarea,select{width:100%;border:1.5px solid var(--gray-2);border-radius:var(--radius-sm);padding:10px 13px;font-size:14px;color:var(--gray-6);background:white;font-family:inherit;transition:border-color .2s,box-shadow .2s}
+input[type=text]:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,95,165,.1)}
 textarea{min-height:90px;resize:vertical}
+
+/* OPCIONES */
 .options{display:flex;flex-direction:column;gap:6px}
-.opt-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid #e8e7e3;cursor:pointer;transition:all 0.15s;user-select:none}
-.opt-item:hover{border-color:#185fa5;background:#f0f6ff}
-.opt-item.selected{border-color:#185fa5;background:#E6F1FB}
-.opt-circle{width:16px;height:16px;border-radius:50%;border:2px solid #b4b2a9;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
-.opt-square{width:16px;height:16px;border-radius:3px;border:2px solid #b4b2a9;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
-.opt-item.selected .opt-circle,.opt-item.selected .opt-square{border-color:#185fa5;background:#185fa5}
+.opt-item{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border-radius:var(--radius-sm);border:1.5px solid var(--gray-2);cursor:pointer;transition:all .15s;user-select:none}
+.opt-item:hover{border-color:var(--blue-mid);background:#f7fbff;transform:translateY(-1px);box-shadow:0 2px 6px rgba(24,95,165,.08)}
+.opt-item.selected{border-color:var(--blue);background:var(--blue-light);box-shadow:0 2px 8px rgba(24,95,165,.12)}
+.opt-circle{width:17px;height:17px;border-radius:50%;border:2px solid var(--gray-3);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.opt-square{width:17px;height:17px;border-radius:4px;border:2px solid var(--gray-3);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.opt-item.selected .opt-circle,.opt-item.selected .opt-square{border-color:var(--blue);background:var(--blue)}
 .opt-dot{width:6px;height:6px;border-radius:50%;background:white;display:none}
 .opt-check{display:none}
 .opt-item.selected .opt-dot,.opt-item.selected .opt-check{display:block}
-.opt-text{font-size:13.5px;color:#1a1a18;line-height:1.4}
-.scale-wrap{overflow-x:auto;margin-bottom:0.5rem}
+.opt-text{font-size:13.5px;color:var(--gray-6);line-height:1.4}
+
+/* ESCALAS */
+.scale-wrap{overflow-x:auto;margin-bottom:.5rem}
 .scale-t{width:100%;border-collapse:collapse;font-size:12px;min-width:420px}
-.scale-t th{background:#f5f4f0;padding:7px 6px;text-align:center;font-weight:500;color:#5f5e5a;border-bottom:1px solid #e8e7e3}
+.scale-t th{background:var(--gray-1);padding:8px 6px;text-align:center;font-weight:600;color:var(--gray-5);border-bottom:1.5px solid var(--gray-2)}
 .scale-t th:first-child{text-align:left;min-width:160px}
-.scale-t td{padding:7px 6px;border-bottom:1px solid #f1efe8;text-align:center;color:#1a1a18;vertical-align:middle}
+.scale-t td{padding:8px 6px;border-bottom:1px solid #f1efe8;text-align:center;color:var(--gray-6);vertical-align:middle}
 .scale-t td:first-child{text-align:left;font-size:13px;padding-right:12px}
 .scale-t tr:last-child td{border-bottom:none}
 .scale-t tr:hover td{background:#fafaf8}
-.scale-radio{width:18px;height:18px;cursor:pointer;accent-color:#185fa5}
+.scale-radio{width:18px;height:18px;cursor:pointer;accent-color:var(--blue)}
 .drug-t{width:100%;border-collapse:collapse;font-size:12.5px}
-.drug-t th{background:#f5f4f0;padding:6px 8px;text-align:left;font-weight:500;color:#5f5e5a;border-bottom:1px solid #e8e7e3}
-.drug-t td{padding:6px 8px;border-bottom:1px solid #f1efe8;color:#1a1a18;vertical-align:middle}
+.drug-t th{background:var(--gray-1);padding:7px 8px;text-align:left;font-weight:600;color:var(--gray-5);border-bottom:1.5px solid var(--gray-2)}
+.drug-t td{padding:7px 8px;border-bottom:1px solid #f1efe8;color:var(--gray-6);vertical-align:middle}
 .drug-t tr:last-child td{border-bottom:none}
-.dose-chip{display:inline-block;background:#E6F1FB;color:#0C447C;border-radius:4px;padding:1px 6px;font-size:11px;margin:1px}
-.drug-check{accent-color:#185fa5;width:15px;height:15px;cursor:pointer;vertical-align:middle}
-.drug-select{width:110px;font-size:12px;padding:3px 6px;border:1px solid #d3d1c7;border-radius:6px;margin-left:4px}
-.divider{height:1px;background:#f1efe8;margin:1.25rem 0}
-.alert{padding:10px 12px;border-radius:8px;font-size:12.5px;margin-bottom:1rem;border-left:3px solid}
-.alert-info{background:#E6F1FB;border-color:#185fa5;color:#0C447C}
-.alert-warn{background:#FCEBEB;border-color:#A32D2D;color:#791F1F}
-.alert-cond{background:#FAEEDA;border-color:#BA7517;color:#633806}
-.nav-row{display:flex;gap:8px;margin-top:1.5rem;padding-top:1rem;border-top:1px solid #f1efe8}
-.btn-next{flex:1;padding:12px;background:#185fa5;color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.15s}
-.btn-next:hover{background:#0C447C}
-.btn-next.green{background:#0f6e56}
-.btn-next.green:hover{background:#085041}
-.btn-back{padding:12px 16px;background:white;border:1px solid #d3d1c7;border-radius:8px;font-size:14px;color:#5f5e5a;cursor:pointer;font-family:inherit;transition:all 0.15s}
-.btn-back:hover{background:#f5f4f0}
+.dose-chip{display:inline-block;background:var(--blue-light);color:var(--blue-dark);border-radius:4px;padding:1px 6px;font-size:11px;margin:1px;font-weight:500}
+.drug-check{accent-color:var(--blue);width:15px;height:15px;cursor:pointer;vertical-align:middle}
+.drug-select{width:110px;font-size:12px;padding:3px 6px;border:1.5px solid var(--gray-2);border-radius:6px;margin-left:4px}
+.divider{height:1px;background:var(--gray-2);margin:1.25rem 0}
+
+/* ALERTAS */
+.alert{padding:11px 13px;border-radius:var(--radius-sm);font-size:12.5px;margin-bottom:1rem;border-left:3px solid;display:flex;gap:8px;align-items:flex-start}
+.alert-icon{flex-shrink:0;margin-top:1px}
+.alert-info{background:var(--blue-light);border-color:var(--blue);color:var(--blue-dark)}
+.alert-warn{background:var(--red-light);border-color:var(--red);color:#791F1F}
+.alert-cond{background:var(--amber-light);border-color:var(--amber);color:#633806}
+.alert-green{background:var(--teal-light);border-color:var(--teal);color:var(--teal-mid)}
+
+/* NAV */
+.nav-row{display:flex;gap:8px;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--gray-2)}
+.btn-next{flex:1;padding:13px;background:linear-gradient(135deg,var(--blue),#2472c8);color:white;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;letter-spacing:.01em}
+.btn-next:hover{background:linear-gradient(135deg,var(--blue-dark),#185fa5);box-shadow:0 4px 12px rgba(24,95,165,.3);transform:translateY(-1px)}
+.btn-next.green{background:linear-gradient(135deg,var(--teal),#0a8a6a)}
+.btn-next.green:hover{background:linear-gradient(135deg,#085041,var(--teal));box-shadow:0 4px 12px rgba(15,110,86,.3)}
+.btn-back{padding:13px 18px;background:white;border:1.5px solid var(--gray-2);border-radius:var(--radius-sm);font-size:14px;color:var(--gray-5);cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-back:hover{background:var(--gray-1);border-color:var(--gray-3)}
+
+/* VISTAS */
 .sec-view{display:none}
 .sec-view.active{display:block}
 .cond-block{display:none}
 .cond-block.show{display:block}
-/* Pantalla de envío */
+
+/* PANTALLA ENVIADO */
 .send-screen{text-align:center;padding:2.5rem 1.5rem}
-.send-icon{width:64px;height:64px;background:#EAF3DE;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem}
-.send-title{font-size:20px;font-weight:500;color:#1a3a5c;margin-bottom:8px}
-.send-sub{font-size:13px;color:#5f5e5a;line-height:1.6;margin-bottom:1.5rem}
-.send-note{font-size:12px;color:#888;background:#f5f4f0;border-radius:8px;padding:10px 14px;margin-top:1rem}
-@media print{body{background:white;padding:0}.app-header,.prog-wrap,.nav-row{display:none!important}.card{box-shadow:none;border:1px solid #e8e7e3;break-inside:avoid}}
+.send-icon{width:72px;height:72px;background:linear-gradient(135deg,#d4edda,var(--teal-light));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;box-shadow:0 4px 16px rgba(39,80,10,.15)}
+.send-title{font-size:1.25rem;font-weight:500;color:var(--navy-mid);margin-bottom:8px}
+.send-sub{font-size:13px;color:var(--gray-5);line-height:1.7;margin-bottom:1.5rem}
+.send-benefits{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:1.25rem 0;text-align:left}
+@media(max-width:480px){.send-benefits{grid-template-columns:1fr}}
+.benefit-item{background:var(--gray-1);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--gray-5);display:flex;gap:8px;align-items:flex-start}
+.benefit-item span{font-size:16px;flex-shrink:0}
+.send-note{font-size:12px;color:var(--gray-4);background:var(--gray-1);border-radius:var(--radius-sm);padding:10px 14px;margin-top:1rem;border:.5px solid var(--gray-2)}
+
+@media print{body{background:white;padding:0}.app-header,.prog-wrap,.nav-row{display:none!important}.card{box-shadow:none;border:1px solid var(--gray-2);break-inside:avoid}}
 </style>
 <!-- ══ FIREBASE CONFIG — reemplace con sus propios valores ══ -->
 <script>
@@ -99,20 +155,49 @@ textarea{min-height:90px;resize:vertical}
 <div class="app">
 
 <div class="app-header">
-  <h1>Formulario de Pre-Consulta</h1>
-  <p>Neurología &amp; Salud Mental &middot; Sus respuestas son confidenciales y solo las verá su médico</p>
+  <div class="header-top">
+    <div class="header-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2a7 7 0 0 1 7 7c0 4-3 7-7 9-4-2-7-5-7-9a7 7 0 0 1 7-7z" stroke="white" stroke-width="1.6"/><path d="M12 8v4M12 14v.5" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </div>
+    <div>
+      <h1>Formulario de Pre-Consulta</h1>
+      <div class="subtitle">Neurología &amp; Salud Mental · Sus respuestas son confidenciales</div>
+    </div>
+  </div>
+  <div class="header-benefit">
+    <strong>✨ ¿Por qué completar este formulario?</strong>
+    Sus respuestas permiten al médico preparar la consulta con anticipación, identificar patrones relevantes y ofrecerle un plan de tratamiento más preciso desde el primer minuto de atención.
+  </div>
 </div>
 
 <div class="prog-wrap">
-  <div class="prog-label"><span id="sec-name">Bienvenida</span><span id="sec-count">1 / 5</span></div>
+  <div class="prog-top">
+    <span class="prog-name" id="sec-name">Bienvenida</span>
+    <span class="prog-count" id="sec-count">1 de 5</span>
+  </div>
   <div class="prog-bar"><div class="prog-fill" id="prog" style="width:20%"></div></div>
+  <div class="prog-steps">
+    <span class="prog-step active" id="ps1">Datos</span>
+    <span class="prog-step" id="ps2">Motivo</span>
+    <span class="prog-step" id="ps3">Síntomas</span>
+    <span class="prog-step" id="ps4">Antecedentes</span>
+    <span class="prog-step" id="ps5">Medicamentos</span>
+  </div>
 </div>
 
 <!-- S1: BIENVENIDA -->
 <div id="s1" class="card sec-view active">
-  <span class="sec-badge">Sección 1 de 5</span>
-  <div class="sec-title">Bienvenido/a</div>
-  <div class="sec-sub">Por favor complete este formulario antes de su consulta. Sus respuestas ayudarán al médico a prepararse para atenderle mejor.</div>
+  <span class="sec-badge">📋 Sección 1 de 5</span>
+  <div class="sec-title">Bienvenido/a — empecemos</div>
+  <div class="sec-sub">Este formulario toma entre 5 y 8 minutos. Cada respuesta que entregue ayuda a su médico a conocerle mejor antes de que usted entre a la consulta.</div>
+
+  <div class="tip-box">
+    <span class="tip-icon">💡</span>
+    <div class="tip-text">
+      <strong>Responda con calma y honestidad</strong>
+      No hay respuestas correctas o incorrectas. Cuanto más detallado sea, más útil será para su diagnóstico y tratamiento.
+    </div>
+  </div>
 
   <div class="q">
     <div class="q-text">Nombre completo <span class="req">*</span></div>
@@ -155,36 +240,207 @@ textarea{min-height:90px;resize:vertical}
 
 <!-- S2: MOTIVO DE CONSULTA -->
 <div id="s2" class="card sec-view">
-  <span class="sec-badge">Sección 2 de 5</span>
-  <div class="sec-title">Motivo de consulta principal</div>
-  <div class="sec-sub">Seleccione el motivo <strong>principal</strong>. Solo uno. Las preguntas que siguen se adaptarán según su selección.</div>
-  <div class="q">
-    <div class="q-text">¿Cuál es el motivo principal de su consulta? <span class="req">*</span></div>
-    <div class="options" id="motivos">
-      <div class="opt-item" data-v="cefalea"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Dolor de cabeza / cefalea</span></div>
-      <div class="opt-item" data-v="insomnio"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Problemas para dormir / insomnio</span></div>
-      <div class="opt-item" data-v="tdah"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Dificultad de concentración o atención (TDAH)</span></div>
-      <div class="opt-item" data-v="tea"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Trastorno del espectro autista (TEA)</span></div>
-      <div class="opt-item" data-v="depresion"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Estado de ánimo bajo, tristeza o desesperanza</span></div>
-      <div class="opt-item" data-v="ansiedad"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Nerviosismo, angustia o ansiedad excesiva</span></div>
-      <div class="opt-item" data-v="mareos"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Mareos, vértigo o inestabilidad</span></div>
-      <div class="opt-item" data-v="memoria"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Problemas de memoria o confusión</span></div>
-      <div class="opt-item" data-v="seguimiento"><span class="opt-circle"><span class="opt-dot"></span></span><span class="opt-text">Control de medicación / seguimiento</span></div>
+  <span class="sec-badge">🎯 Sección 2 de 5</span>
+  <div class="sec-title">Cuéntenos qué le trae hoy</div>
+  <div class="sec-sub">Escríbalo con sus propias palabras, como se lo contaría a un familiar. La IA leerá su descripción y seleccionará automáticamente el motivo de consulta más adecuado.</div>
+
+  <div class="tip-box">
+    <span class="tip-icon">🤖</span>
+    <div class="tip-text">
+      <strong>No necesita usar términos médicos</strong>
+      Escriba con naturalidad: "me duele mucho la cabeza", "no puedo dormir hace meses", "me cuesta concentrarme en el trabajo". El sistema lo entenderá y organizará la información para su médico.
     </div>
   </div>
-  <div class="q">
-    <div class="q-text">Explique brevemente con sus palabras qué es lo que espera resolver con esta consulta <span class="req">*</span></div>
-    <textarea id="preguntas" placeholder="Ej: Quiero entender por qué me duele la cabeza frecuentemente y saber si hay algún tratamiento..."></textarea>
+
+  <!-- PASO A: Texto libre -->
+  <div id="ia-paso-a">
+    <div class="q">
+      <div class="q-text">¿Qué es lo que le pasa? Cuéntenos con sus palabras <span class="req">*</span></div>
+      <textarea id="preguntas" placeholder="Ej: Llevo varios meses con dolores de cabeza muy fuertes, casi todos los días. Me duele más de un lado, con náuseas. No puedo trabajar bien y los analgésicos ya no me hacen efecto como antes..." rows="5"></textarea>
+
+      <!-- AUDIO -->
+      <div style="margin-top:.75rem">
+        <div style="font-size:12px;color:var(--gray-4);margin-bottom:.5rem;text-align:center">— o cuéntenos en voz —</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button id="btn-grabar" onclick="toggleGrabacion()" type="button"
+            style="display:flex;align-items:center;gap:7px;padding:9px 16px;background:var(--teal-light);border:1.5px solid var(--teal);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;color:var(--teal-mid);cursor:pointer;transition:all .2s">
+            <span id="mic-icon">🎙️</span>
+            <span id="btn-grabar-txt">Grabar audio</span>
+          </button>
+          <div id="audio-timer" style="display:none;font-size:13px;color:var(--red);font-weight:500">
+            ⏺ <span id="audio-seconds">0:00</span>
+          </div>
+          <button id="btn-audio-clear" onclick="limpiarAudio()" type="button" style="display:none;font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;text-decoration:underline">Descartar</button>
+        </div>
+        <div id="audio-preview" style="display:none;margin-top:.6rem">
+          <audio id="audio-player" controls style="width:100%;border-radius:var(--radius-sm);height:36px"></audio>
+          <div style="font-size:11.5px;color:var(--teal-mid);margin-top:4px">✓ Audio grabado — la IA transcribirá y analizará su voz</div>
+        </div>
+        <div id="audio-error" style="display:none;font-size:12px;color:var(--red);margin-top:5px"></div>
+      </div>
+    </div>
+    <div id="ia-error" style="display:none" class="alert alert-warn" style="margin-top:.5rem">
+      <span class="alert-icon">⚠</span>
+      <span id="ia-error-txt">Por favor escriba al menos 20 palabras para que la IA pueda identificar su motivo de consulta.</span>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goTo(1)">← Atrás</button>
+      <button class="btn-next" id="btn-analizar" onclick="analizarMotivo()">Analizar</button>
+    </div>
   </div>
-  <div class="nav-row"><button class="btn-back" onclick="goTo(1)">← Atrás</button><button class="btn-next" onclick="goTo(3)">Continuar →</button></div>
+
+  <!-- PASO B: Resultado IA + confirmación -->
+  <div id="ia-paso-b" style="display:none">
+    <div id="ia-loading" style="display:none;text-align:center;padding:1.5rem 0">
+      <div style="font-size:28px;margin-bottom:10px;animation:spin 1.5s linear infinite;display:inline-block">⟳</div>
+      <div style="font-size:14px;color:var(--gray-4)">Analizando su descripción…</div>
+    </div>
+
+    <div id="ia-resultado" style="display:none">
+      <div class="alert alert-green" style="margin-bottom:1.25rem">
+        <span class="alert-icon">✅</span>
+        <div>
+          <strong>La IA identificó su motivo principal</strong><br>
+          <span style="font-size:12px">Revise si es correcto. Puede cambiarlo si no coincide con lo que usted siente.</span>
+        </div>
+      </div>
+
+      <!-- Motivo detectado -->
+      <div style="margin-bottom:1rem">
+        <div class="q-text" style="margin-bottom:.6rem">Motivo identificado:</div>
+        <div id="ia-motivo-detectado" style="background:var(--blue-light);border:2px solid var(--blue);border-radius:var(--radius-sm);padding:12px 15px;font-size:14px;font-weight:500;color:var(--blue-dark)"></div>
+        <div id="ia-explicacion" style="font-size:12.5px;color:var(--gray-5);margin-top:8px;line-height:1.6"></div>
+      </div>
+
+      <!-- Selector manual por si no coincide -->
+      <div id="ia-cambiar-wrap" style="display:none">
+        <div class="q-text" style="margin-bottom:1rem;font-size:13px">¿No es correcto? Seleccione su motivo:</div>
+
+        <style>
+        .motivo-grupo{margin-bottom:1rem}
+        .motivo-grupo-title{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem;padding:6px 10px;border-radius:6px}
+        .motivo-grupo-icon{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+        .motivo-cards{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+        @media(max-width:480px){.motivo-cards{grid-template-columns:1fr}}
+        .motivo-card-item{border:1.5px solid var(--gray-2);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .18s;user-select:none;background:white;display:flex;align-items:center;gap:9px}
+        .motivo-card-item:hover{border-color:var(--blue-mid);background:#f7fbff;transform:translateY(-1px);box-shadow:0 2px 8px rgba(24,95,165,.08)}
+        .motivo-card-item.selected{border-color:var(--blue);background:var(--blue-light);box-shadow:0 2px 10px rgba(24,95,165,.15)}
+        .motivo-card-emoji{font-size:20px;flex-shrink:0;line-height:1}
+        .motivo-card-label{font-size:12.5px;color:var(--gray-6);line-height:1.4;font-weight:400}
+        .motivo-card-item.selected .motivo-card-label{color:var(--blue-dark);font-weight:500}
+        </style>
+
+        <div id="motivos">
+
+          <!-- Dolor físico -->
+          <div class="motivo-grupo">
+            <div class="motivo-grupo-title" style="background:#FDECEA;color:#9B2626">
+              <div class="motivo-grupo-icon" style="background:#C0392B"></div>
+              Dolor y malestar físico
+            </div>
+            <div class="motivo-cards">
+              <div class="motivo-card-item opt-item" data-v="cefalea">
+                <span class="motivo-card-label">Me duele la cabeza con frecuencia</span>
+              </div>
+              <div class="motivo-card-item opt-item" data-v="mareos">
+                <span class="motivo-card-label">Tengo mareos o sensación de inestabilidad</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sueño -->
+          <div class="motivo-grupo">
+            <div class="motivo-grupo-title" style="background:#EAF0FB;color:#1a3a5c">
+              <div class="motivo-grupo-icon" style="background:#2563a8"></div>
+              Sueño y descanso
+            </div>
+            <div class="motivo-cards">
+              <div class="motivo-card-item opt-item" data-v="insomnio">
+                <span class="motivo-card-label">No puedo dormir bien o me cuesta descansar</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ánimo -->
+          <div class="motivo-grupo">
+            <div class="motivo-grupo-title" style="background:#FEF9E7;color:#7D6008">
+              <div class="motivo-grupo-icon" style="background:#D4AC0D"></div>
+              Ánimo y emociones
+            </div>
+            <div class="motivo-cards">
+              <div class="motivo-card-item opt-item" data-v="depresion">
+                <span class="motivo-card-label">Me siento triste, sin energía o sin motivación</span>
+              </div>
+              <div class="motivo-card-item opt-item" data-v="ansiedad">
+                <span class="motivo-card-label">Siento angustia o preocupación constante</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Atención -->
+          <div class="motivo-grupo">
+            <div class="motivo-grupo-title" style="background:#E9F7EF;color:#1E6B3C">
+              <div class="motivo-grupo-icon" style="background:#1E8449"></div>
+              Atención y cognición
+            </div>
+            <div class="motivo-cards">
+              <div class="motivo-card-item opt-item" data-v="tdah">
+                <span class="motivo-card-label">Me cuesta concentrarme o mantener la atención</span>
+              </div>
+              <div class="motivo-card-item opt-item" data-v="memoria">
+                <span class="motivo-card-label">Tengo fallas de memoria o confusión</span>
+              </div>
+              <div class="motivo-card-item opt-item" data-v="tea">
+                <span class="motivo-card-label">Me han sugerido evaluar trastorno del espectro autista</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seguimiento -->
+          <div class="motivo-grupo">
+            <div class="motivo-grupo-title" style="background:#EAF5F5;color:#0E6655">
+              <div class="motivo-grupo-icon" style="background:#0E8C7A"></div>
+              Seguimiento
+            </div>
+            <div class="motivo-cards">
+              <div class="motivo-card-item opt-item" data-v="seguimiento">
+                <span class="motivo-card-label">Vengo a control de mi tratamiento o medicación</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <button onclick="toggleCambiar()" style="font-size:12.5px;color:var(--blue);background:none;border:none;cursor:pointer;padding:4px 0;text-decoration:underline;margin-bottom:1rem" id="btn-cambiar">
+        ✏️ El motivo no es correcto, quiero cambiarlo
+      </button>
+    </div>
+
+    <div class="nav-row" id="ia-nav-b" style="display:none">
+      <button class="btn-back" onclick="volverPasoA()">← Editar texto</button>
+      <button class="btn-next" onclick="confirmarMotivo()">Confirmar y continuar →</button>
+    </div>
+  </div>
 </div>
 
 <!-- S3: CUESTIONARIO SEGÚN MOTIVO -->
 <div id="s3" class="card sec-view">
-  <span class="sec-badge">Sección 3 de 5</span>
-  <div id="s5-title-cef" style="display:none"><div class="sec-title">Dolor de cabeza</div><div class="sec-sub">Complete los detalles de su cefalea.</div></div>
-  <div id="s5-title-scale" style="display:none"><div class="sec-title">Cuestionario clínico</div><div class="sec-sub">Evalúe cómo se ha sentido en las últimas 2 semanas.</div></div>
-  <div id="s5-title-other" style="display:none"><div class="sec-title">Para finalizar</div><div class="sec-sub">Gracias por completar el formulario.</div></div>
+  <span class="sec-badge">📊 Sección 3 de 5</span>
+  <div id="s5-title-cef" style="display:none">
+    <div class="sec-title">Características de su dolor de cabeza</div>
+    <div class="sec-sub">Estas preguntas permiten al médico clasificar su tipo de cefalea antes de verle, lo que hace la consulta más eficiente y el tratamiento más preciso.</div>
+    <div class="tip-box"><span class="tip-icon">⏱</span><div class="tip-text"><strong>Cada detalle cuenta</strong>La localización, tipo y frecuencia del dolor son claves para distinguir entre migraña, cefalea tensional u otras causas. Responda lo más específicamente posible.</div></div>
+  </div>
+  <div id="s5-title-scale" style="display:none">
+    <div class="sec-title">Cuestionario clínico validado</div>
+    <div class="sec-sub">A continuación encontrará un cuestionario estándar usado en neurología y salud mental. Sus respuestas generan una puntuación objetiva que el médico usará en su evaluación.</div>
+    <div class="tip-box"><span class="tip-icon">📝</span><div class="tip-text"><strong>Sea lo más honesto/a posible</strong>No existen respuestas buenas ni malas. Este cuestionario ayuda a detectar patrones que a veces son difíciles de describir con palabras.</div></div>
+  </div>
+  <div id="s5-title-other" style="display:none">
+    <div class="sec-title">Información adicional</div>
+    <div class="sec-sub">Solo unos datos más para completar su ficha clínica.</div>
+  </div>
 
   <!-- CEFALEA -->
   <div id="cef-block" class="cond-block">
@@ -374,43 +630,60 @@ textarea{min-height:90px;resize:vertical}
 
 <!-- S4: ANTECEDENTES -->
 <div id="s4" class="card sec-view">
-  <span class="sec-badge">Sección 4 de 5</span>
+  <span class="sec-badge">🏥 Sección 4 de 5</span>
   <div class="sec-title">Antecedentes médicos</div>
-  <div class="sec-sub">Marque todas las que correspondan.</div>
+  <div class="sec-sub">Esta información es fundamental para que el médico evalúe riesgos y evite indicar tratamientos que puedan interactuar con su condición de salud. Marque todas las que correspondan.</div>
+  <div class="tip-box"><span class="tip-icon">🔒</span><div class="tip-text"><strong>Su información es confidencial</strong>Solo la verá su médico tratante. Ser preciso/a aquí puede evitar interacciones medicamentosas y hacer su tratamiento más seguro.</div></div>
 
   <div class="q">
-    <div class="q-text">Condiciones crónicas</div>
-    <div class="options" id="antec">
-      <div class="opt-item" data-v="Hipertensión"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Hipertensión arterial</span></div>
-      <div class="opt-item" data-v="Diabetes"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Diabetes</span></div>
-      <div class="opt-item" data-v="Obesidad"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Obesidad</span></div>
-      <div class="opt-item" data-v="Colesterol alto"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Colesterol o triglicéridos elevados</span></div>
-      <div class="opt-item" data-v="Hipotiroidismo"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Hipotiroidismo</span></div>
-      <div class="opt-item" data-v="Anticonceptivos orales"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Uso de anticonceptivos orales</span></div>
-      <div class="opt-item" data-v="Tabaquismo"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Tabaquismo (fumador activo)</span></div>
-      <div class="opt-item" data-v="Ninguna"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Ninguna de las anteriores</span></div>
-    </div>
-  </div>
 
-  <div class="q">
-    <div class="q-text">Eventos vasculares o cardíacos previos</div>
-    <div class="options" id="vasculares">
-      <div class="opt-item" data-v="ACV"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Accidente cerebrovascular (ACV)</span></div>
-      <div class="opt-item" data-v="Infarto"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Infarto al corazón</span></div>
-      <div class="opt-item" data-v="TVP"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Trombosis venosa profunda (TVP)</span></div>
-      <div class="opt-item" data-v="Más de 3 abortos espontáneos"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Más de 3 abortos espontáneos</span></div>
-      <div class="opt-item" data-v="Ninguno"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Ninguno</span></div>
+    <!-- Condiciones crónicas -->
+    <div class="motivo-grupo">
+      <div class="motivo-grupo-title" style="background:#EAF0FB;color:#1a3a5c">
+        <div class="motivo-grupo-icon" style="background:#2563a8"></div>
+        Condiciones crónicas
+      </div>
+      <div class="motivo-cards" id="antec">
+        <div class="motivo-card-item opt-item" data-v="Hipertensión"><span class="motivo-card-label">Hipertensión arterial</span></div>
+        <div class="motivo-card-item opt-item" data-v="Diabetes"><span class="motivo-card-label">Diabetes</span></div>
+        <div class="motivo-card-item opt-item" data-v="Obesidad"><span class="motivo-card-label">Obesidad</span></div>
+        <div class="motivo-card-item opt-item" data-v="Colesterol alto"><span class="motivo-card-label">Colesterol o triglicéridos elevados</span></div>
+        <div class="motivo-card-item opt-item" data-v="Hipotiroidismo"><span class="motivo-card-label">Hipotiroidismo</span></div>
+        <div class="motivo-card-item opt-item" data-v="Anticonceptivos orales"><span class="motivo-card-label">Uso de anticonceptivos orales</span></div>
+        <div class="motivo-card-item opt-item" data-v="Tabaquismo"><span class="motivo-card-label">Tabaquismo (fumador activo)</span></div>
+        <div class="motivo-card-item opt-item" data-v="Ninguna"><span class="motivo-card-label">Ninguna de las anteriores</span></div>
+      </div>
     </div>
-  </div>
 
-  <div class="q">
-    <div class="q-text">Antecedentes familiares relevantes</div>
-    <div class="options" id="familiares">
-      <div class="opt-item" data-v="Trombofilia familiar"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Trombofilia conocida en familia</span></div>
-      <div class="opt-item" data-v="ACV familiar"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">ACV en familiar directo</span></div>
-      <div class="opt-item" data-v="Migraña familiar"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Migraña en familiar directo</span></div>
-      <div class="opt-item" data-v="Ninguno familiar"><span class="opt-square"><svg class="opt-check" width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8"/></svg></span><span class="opt-text">Ninguno relevante</span></div>
+    <!-- Eventos vasculares -->
+    <div class="motivo-grupo" style="margin-top:.75rem">
+      <div class="motivo-grupo-title" style="background:#FDECEA;color:#9B2626">
+        <div class="motivo-grupo-icon" style="background:#C0392B"></div>
+        Eventos vasculares o cardíacos previos
+      </div>
+      <div class="motivo-cards" id="vasculares">
+        <div class="motivo-card-item opt-item" data-v="ACV"><span class="motivo-card-label">Accidente cerebrovascular (ACV)</span></div>
+        <div class="motivo-card-item opt-item" data-v="Infarto"><span class="motivo-card-label">Infarto al corazón</span></div>
+        <div class="motivo-card-item opt-item" data-v="TVP"><span class="motivo-card-label">Trombosis venosa profunda (TVP)</span></div>
+        <div class="motivo-card-item opt-item" data-v="Más de 3 abortos espontáneos"><span class="motivo-card-label">Más de 3 abortos espontáneos</span></div>
+        <div class="motivo-card-item opt-item" data-v="Ninguno"><span class="motivo-card-label">Ninguno</span></div>
+      </div>
     </div>
+
+    <!-- Antecedentes familiares -->
+    <div class="motivo-grupo" style="margin-top:.75rem">
+      <div class="motivo-grupo-title" style="background:#E9F7EF;color:#1E6B3C">
+        <div class="motivo-grupo-icon" style="background:#1E8449"></div>
+        Antecedentes familiares relevantes
+      </div>
+      <div class="motivo-cards" id="familiares">
+        <div class="motivo-card-item opt-item" data-v="Trombofilia familiar"><span class="motivo-card-label">Trombofilia conocida en familia</span></div>
+        <div class="motivo-card-item opt-item" data-v="ACV familiar"><span class="motivo-card-label">ACV en familiar directo</span></div>
+        <div class="motivo-card-item opt-item" data-v="Migraña familiar"><span class="motivo-card-label">Migraña en familiar directo</span></div>
+        <div class="motivo-card-item opt-item" data-v="Ninguno familiar"><span class="motivo-card-label">Ninguno relevante</span></div>
+      </div>
+    </div>
+
   </div>
 
   <div class="nav-row"><button class="btn-back" onclick="goTo(3)">← Atrás</button><button class="btn-next" onclick="goTo(5)">Continuar →</button></div>
@@ -418,9 +691,9 @@ textarea{min-height:90px;resize:vertical}
 
 <!-- S5: MEDICAMENTOS -->
 <div id="s5" class="card sec-view">
-  <span class="sec-badge">Sección 5 de 5</span>
+  <span class="sec-badge">💊 Sección 5 de 5 — ¡Casi listo!</span>
   <div class="sec-title">Medicamentos actuales</div>
-  <div class="sec-sub">Marque los que usa habitualmente e indique la dosis.</div>
+  <div class="sec-sub">Indicar los medicamentos que usa permite al médico evitar duplicaciones, detectar posibles causas de sus síntomas y ajustar el tratamiento desde el inicio. Marque los que usa e indique la dosis.</div>
   <div class="q">
     <div class="q-text">¿Usa algún medicamento frecuentemente? <span class="req">*</span></div>
     <div class="options" id="usamed">
@@ -479,11 +752,17 @@ textarea{min-height:90px;resize:vertical}
 <div id="s-sent" class="card sec-view" style="display:none">
   <div class="send-screen">
     <div class="send-icon">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><polyline points="20,6 9,17 4,12" stroke="#27500A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><polyline points="20,6 9,17 4,12" stroke="#27500A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
-    <div class="send-title">Formulario enviado correctamente</div>
-    <div class="send-sub">Sus respuestas han quedado registradas. El equipo médico revisará la información antes de su consulta.<br><br>Puede cerrar esta ventana o esperar a ser llamado/a.</div>
-    <div class="send-note">Si necesita corregir algo, avise al personal de recepción antes de su hora de atención.</div>
+    <div class="send-title">¡Formulario enviado correctamente!</div>
+    <div class="send-sub">Sus respuestas han quedado registradas y su médico las revisará antes de la consulta.<br>Gracias por tomarse el tiempo de completarlo con detalle.</div>
+    <div class="send-benefits">
+      <div class="benefit-item"><span>⚡</span><div>La consulta será <strong>más eficiente</strong> y enfocada en lo que importa</div></div>
+      <div class="benefit-item"><span>🎯</span><div>El diagnóstico será <strong>más preciso</strong> desde el primer momento</div></div>
+      <div class="benefit-item"><span>💊</span><div>El tratamiento estará <strong>adaptado</strong> a su historial y síntomas</div></div>
+      <div class="benefit-item"><span>🤝</span><div>El médico llegará <strong>preparado</strong> para responder sus preguntas</div></div>
+    </div>
+    <div class="send-note">Puede cerrar esta ventana o esperar a ser llamado/a.<br>Si necesita corregir algo, avise al personal de recepción antes de su hora de atención.</div>
   </div>
 </div>
 
@@ -499,6 +778,8 @@ const names=['','Bienvenida','Motivo de consulta','Cuestionario','Antecedentes',
 const DASHBOARD_FILE = 'dashboard_clinico.html';
 
 function getMotivo(){
+  // Priorizar el motivo detectado/confirmado por IA
+  if(window._motivoIA) return window._motivoIA;
   const e=document.getElementById('motivos').querySelector('.opt-item.selected');
   return e?e.dataset.v:'';
 }
@@ -508,8 +789,14 @@ function goTo(n){
   cur=n;
   document.getElementById('s'+cur).classList.add('active');
   document.getElementById('sec-name').textContent=names[n];
-  document.getElementById('sec-count').textContent=n+' / '+TOTAL;
+  document.getElementById('sec-count').textContent=n+' de '+TOTAL;
   document.getElementById('prog').style.width=Math.round((n/TOTAL)*100)+'%';
+  // Actualizar pasos
+  for(let i=1;i<=TOTAL;i++){
+    const el=document.getElementById('ps'+i);
+    if(!el)continue;
+    el.className='prog-step'+(i<n?' done':i===n?' active':'');
+  }
   window.scrollTo(0,0);
   if(n===5) showDiabetesMeds();
   if(n===3) setupS3();
@@ -664,12 +951,241 @@ function submitForm(){
     });
 }
 
+// ══ AUDIO — GRABACIÓN Y TRANSCRIPCIÓN ══
+let _mediaRecorder = null;
+let _audioChunks = [];
+let _audioBlob = null;
+let _grabando = false;
+let _timerInterval = null;
+let _segundos = 0;
+
+async function toggleGrabacion(){
+  if(_grabando) detenerGrabacion();
+  else await iniciarGrabacion();
+}
+
+async function iniciarGrabacion(){
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    _audioChunks = [];
+    _mediaRecorder = new MediaRecorder(stream);
+    _mediaRecorder.ondataavailable = e=>{ if(e.data.size>0) _audioChunks.push(e.data); };
+    _mediaRecorder.onstop = procesarAudio;
+    _mediaRecorder.start();
+    _grabando = true;
+    _segundos = 0;
+
+    document.getElementById('btn-grabar').style.borderColor = 'var(--red)';
+    document.getElementById('btn-grabar').style.color = 'var(--red)';
+    document.getElementById('mic-icon').textContent = '⏹️';
+    document.getElementById('btn-grabar-txt').textContent = 'Detener grabación';
+    document.getElementById('audio-timer').style.display = '';
+    document.getElementById('audio-preview').style.display = 'none';
+    document.getElementById('btn-audio-clear').style.display = 'none';
+    document.getElementById('audio-error').style.display = 'none';
+
+    _timerInterval = setInterval(()=>{
+      _segundos++;
+      const m = Math.floor(_segundos/60);
+      const s = (_segundos%60).toString().padStart(2,'0');
+      document.getElementById('audio-seconds').textContent = m+':'+s;
+      if(_segundos >= 120) detenerGrabacion(); // máx 2 min
+    }, 1000);
+
+  } catch(e){
+    document.getElementById('audio-error').style.display = '';
+    document.getElementById('audio-error').textContent = 'No se pudo acceder al micrófono. Verifique los permisos del navegador.';
+  }
+}
+
+function detenerGrabacion(){
+  if(_mediaRecorder && _grabando){
+    _mediaRecorder.stop();
+    _mediaRecorder.stream.getTracks().forEach(t=>t.stop());
+    _grabando = false;
+    clearInterval(_timerInterval);
+    document.getElementById('btn-grabar').style.borderColor = '';
+    document.getElementById('btn-grabar').style.color = '';
+    document.getElementById('mic-icon').textContent = '🎙️';
+    document.getElementById('btn-grabar-txt').textContent = 'Grabar de nuevo';
+    document.getElementById('audio-timer').style.display = 'none';
+  }
+}
+
+async function procesarAudio(){
+  _audioBlob = new Blob(_audioChunks, {type:'audio/webm'});
+  const url = URL.createObjectURL(_audioBlob);
+  document.getElementById('audio-player').src = url;
+  document.getElementById('audio-preview').style.display = '';
+  document.getElementById('btn-audio-clear').style.display = '';
+
+  // Transcribir con IA (convirtiendo a base64)
+  try {
+    const reader = new FileReader();
+    reader.onloadend = async()=>{
+      const base64 = reader.result.split(',')[1];
+      const resp = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          model:'claude-sonnet-4-20250514',
+          max_tokens:500,
+          system:'Transcribe el audio del paciente fielmente. Si no puedes procesar el audio, responde solo: NO_AUDIO. Solo el texto transcrito, sin comentarios.',
+          messages:[{role:'user',content:[
+            {type:'text',text:'Transcribe lo que dice este paciente:'},
+            {type:'document',source:{type:'base64',media_type:'audio/webm',data:base64}}
+          ]}]
+        })
+      });
+      const data = await resp.json();
+      const transcripcion = (data.content||[]).map(c=>c.text||'').join('').trim();
+      if(transcripcion && transcripcion !== 'NO_AUDIO'){
+        const actual = document.getElementById('preguntas').value.trim();
+        document.getElementById('preguntas').value = actual ? actual+' '+transcripcion : transcripcion;
+      }
+    };
+    reader.readAsDataURL(_audioBlob);
+  } catch(e){ /* transcripción opcional, no bloquear */ }
+}
+
+function limpiarAudio(){
+  _audioBlob = null;
+  _audioChunks = [];
+  document.getElementById('audio-preview').style.display = 'none';
+  document.getElementById('btn-audio-clear').style.display = 'none';
+  document.getElementById('btn-grabar-txt').textContent = 'Grabar audio';
+  document.getElementById('mic-icon').textContent = '🎙️';
+}
+
+// ══ IA — DETECCIÓN DE MOTIVO ══
+const MOTIVO_LABELS = {
+  cefalea:'Dolor de cabeza / cefalea',
+  insomnio:'Problemas para dormir / insomnio',
+  tdah:'Dificultad de concentración o atención (TDAH)',
+  tea:'Trastorno del espectro autista (TEA)',
+  depresion:'Estado de ánimo bajo, tristeza o desesperanza',
+  ansiedad:'Nerviosismo, angustia o ansiedad excesiva',
+  mareos:'Mareos, vértigo o inestabilidad',
+  memoria:'Problemas de memoria o confusión',
+  seguimiento:'Control de medicación / seguimiento'
+};
+
+let _motivoIA = null;
+let _cambiarVisible = false;
+
+async function analizarMotivo(){
+  const texto = document.getElementById('preguntas').value.trim();
+  const palabras = texto.split(/\s+/).filter(w=>w.length>0).length;
+  const tieneAudio = !!_audioBlob;
+
+  if(palabras < 5 && !tieneAudio){
+    document.getElementById('ia-error').style.display='flex';
+    document.getElementById('ia-error-txt').textContent='Por favor escriba algo o grabe un audio para que la IA pueda identificar su motivo de consulta.';
+    return;
+  }
+  document.getElementById('ia-error').style.display='none';
+
+  // Mostrar paso B con loading
+  document.getElementById('ia-paso-a').style.display='none';
+  document.getElementById('ia-paso-b').style.display='';
+  document.getElementById('ia-loading').style.display='';
+  document.getElementById('ia-resultado').style.display='none';
+  document.getElementById('ia-nav-b').style.display='none';
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        system:`Eres un asistente clínico. El paciente describe su motivo de consulta con lenguaje natural. Tu tarea es identificar el motivo principal de entre estas opciones exactas:
+cefalea, insomnio, tdah, tea, depresion, ansiedad, mareos, memoria, seguimiento.
+
+Responde SOLO en JSON sin markdown:
+{"motivo":"CODIGO","explicacion":"Frase corta de 1-2 oraciones explicando por qué seleccionaste este motivo, en tono empático y dirigida al paciente."}`,
+        messages:[{role:'user',content:`El paciente escribe: "${texto}"`}]
+      })
+    });
+    const data = await resp.json();
+    const txt = (data.content||[]).map(c=>c.text||'').join('');
+    let parsed;
+    try{ parsed=JSON.parse(txt.replace(/```json|```/g,'')); }catch(e){ throw new Error('Respuesta inválida'); }
+
+    _motivoIA = parsed.motivo;
+
+    // Mostrar resultado
+    document.getElementById('ia-loading').style.display='none';
+    document.getElementById('ia-resultado').style.display='';
+    document.getElementById('ia-nav-b').style.display='flex';
+    document.getElementById('ia-motivo-detectado').innerHTML = `🎯 ${MOTIVO_LABELS[_motivoIA]||_motivoIA}`;
+    document.getElementById('ia-explicacion').textContent = parsed.explicacion||'';
+
+    // Pre-seleccionar en la lista por si quiere cambiar
+    seleccionarMotivoEnLista(_motivoIA);
+
+  } catch(e) {
+    // Si falla la IA, mostrar selector manual
+    document.getElementById('ia-loading').style.display='none';
+    document.getElementById('ia-resultado').style.display='';
+    document.getElementById('ia-nav-b').style.display='flex';
+    document.getElementById('ia-motivo-detectado').innerHTML='⚠️ No se pudo analizar automáticamente';
+    document.getElementById('ia-explicacion').textContent='Por favor seleccione manualmente su motivo de consulta.';
+    _motivoIA = null;
+    mostrarCambiar();
+  }
+}
+
+function seleccionarMotivoEnLista(motivo){
+  document.querySelectorAll('#motivos .opt-item').forEach(item=>{
+    item.classList.toggle('selected', item.dataset.v===motivo);
+  });
+}
+
+function toggleCambiar(){
+  _cambiarVisible = !_cambiarVisible;
+  document.getElementById('ia-cambiar-wrap').style.display = _cambiarVisible?'':'none';
+  document.getElementById('btn-cambiar').textContent = _cambiarVisible?'✕ Cancelar cambio':'✏️ El motivo no es correcto, quiero cambiarlo';
+}
+
+function mostrarCambiar(){
+  _cambiarVisible = true;
+  document.getElementById('ia-cambiar-wrap').style.display='';
+}
+
+function volverPasoA(){
+  document.getElementById('ia-paso-b').style.display='none';
+  document.getElementById('ia-paso-a').style.display='';
+}
+
+function confirmarMotivo(){
+  const seleccionManual = document.querySelector('#motivos .opt-item.selected');
+  if(seleccionManual){ _motivoIA = seleccionManual.dataset.v; }
+  if(!_motivoIA){
+    alert('Por favor seleccione un motivo de consulta.');
+    mostrarCambiar();
+    return;
+  }
+  seleccionarMotivoEnLista(_motivoIA);
+  goTo(3);
+}
+
 document.addEventListener('DOMContentLoaded',()=>{
   initOpts('estudios',false);
-  initOpts('antec',true);
-  initOpts('vasculares',true);
-  initOpts('familiares',true);
-  initOpts('motivos',false);
+  // Antecedentes usan cards multi-select
+  ['antec','vasculares','familiares'].forEach(id=>{
+    document.querySelectorAll('#'+id+'.motivo-cards .opt-item, #'+id+' .opt-item').forEach(item=>{
+      item.addEventListener('click',()=>item.classList.toggle('selected'));
+    });
+  });
+  // Motivos usan cards single-select
+  document.querySelectorAll('#motivos .opt-item').forEach(item=>{
+    item.addEventListener('click',()=>{
+      document.querySelectorAll('#motivos .opt-item').forEach(i=>i.classList.remove('selected'));
+      item.classList.add('selected');
+      _motivoIA = item.dataset.v;
+    });
+  });
   initOpts('usamed',false);
   document.getElementById('usamed').querySelectorAll('.opt-item').forEach(el=>{
     el.addEventListener('click',()=>document.getElementById('meds-block').classList.toggle('show',el.dataset.v==='Si'));
