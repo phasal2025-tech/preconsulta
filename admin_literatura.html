@@ -3,324 +3,523 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Administración — Literatura Clínica</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script>
-  const FIREBASE_CONFIG = {
-    apiKey:            "AIzaSyBd3THcCXLPhukUU7n2MVGydqjHEYGsMMY",
-    authDomain:        "preconsulta-clinic.firebaseapp.com",
-    databaseURL:       "https://preconsulta-clinic-default-rtdb.firebaseio.com",
-    projectId:         "preconsulta-clinic",
-    storageBucket:     "preconsulta-clinic.firebasestorage.app",
-    messagingSenderId: "202970335277",
-    appId:             "1:202970335277:web:8e64c8ed2b7db3bc7610a4"
-  };
-  firebase.initializeApp(FIREBASE_CONFIG);
-</script>
+<title>TeleSalud Remota</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#0d2b4a;--navy-mid:#1a3a5c;
-  --blue:#185fa5;--blue-light:#E6F1FB;--blue-mid:#B5D4F4;--blue-dark:#0C447C;
-  --green-light:#EAF3DE;--green:#27500A;--green-mid:#3B6D11;
-  --amber-light:#FAEEDA;--amber:#633806;--amber-border:#FAC775;
-  --red-light:#FCEBEB;--red:#791F1F;--red-mid:#A32D2D;
-  --gray-1:#f5f4f0;--gray-2:#e8e7e3;--gray-3:#d3d1c7;
-  --gray-4:#888780;--gray-5:#5f5e5a;--gray-6:#1a1a18;
-  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --teal-50: #e1f5ee;
+  --teal-400: #1d9e75;
+  --teal-700: #085041;
+  --purple-50: #eeedfe;
+  --purple-400: #7f77dd;
+  --purple-700: #3c3489;
+  --amber-50: #faeeda;
+  --amber-400: #ba7517;
+  --amber-600: #854f0b;
+  --coral-50: #faece7;
+  --coral-400: #d85a30;
+  --coral-700: #712b13;
+  --gray-100: #d3d1c7;
+  --gray-400: #888780;
+  --gray-700: #444441;
+  --text: #1a1a18;
+  --text2: #5a5a56;
+  --line: #c8c6bc;
 }
-body{font-family:'DM Sans',sans-serif;background:var(--gray-1);color:var(--gray-6);min-height:100vh;padding:2rem 1rem}
-.page{max-width:760px;margin:0 auto}
-.header{background:var(--navy);color:white;border-radius:var(--radius-lg);padding:1.5rem 1.75rem;margin-bottom:1.25rem}
-.header h1{font-family:'DM Serif Display',serif;font-size:1.4rem;font-weight:400;margin-bottom:4px}
-.header p{font-size:12px;opacity:.6}
-.card{background:white;border:.5px solid var(--gray-2);border-radius:var(--radius-md);padding:1.25rem 1.5rem;margin-bottom:1rem}
-.card-title{font-size:10.5px;font-weight:600;color:var(--gray-4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem;padding-bottom:.6rem;border-bottom:.5px solid var(--gray-2)}
-.motivo-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
-@media(max-width:500px){.motivo-grid{grid-template-columns:1fr}}
-.motivo-card{border:.5px solid var(--gray-2);border-radius:var(--radius-sm);padding:.85rem 1rem;cursor:pointer;transition:border-color .15s}
-.motivo-card:hover{border-color:var(--blue-mid);background:var(--blue-light)}
-.motivo-card.active{border-color:var(--blue);background:var(--blue-light)}
-.motivo-name{font-size:13px;font-weight:500;color:var(--gray-6);margin-bottom:3px}
-.motivo-count{font-size:11px;color:var(--gray-4)}
-.motivo-count.has-docs{color:var(--green-mid);font-weight:500}
-.btn{padding:10px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all .15s}
-.btn-primary{background:var(--navy);color:white}
-.btn-primary:hover{background:var(--blue-dark)}
-.btn-primary:disabled{background:var(--gray-3);cursor:not-allowed}
-.btn-danger{background:var(--red-light);color:var(--red-mid);border:.5px solid var(--red-mid)}
-.btn-danger:hover{background:#F7C1C1}
-.btn-sm{padding:5px 12px;font-size:12px}
-.upload-area{border:1.5px dashed var(--gray-3);border-radius:var(--radius-sm);padding:1.5rem;text-align:center;cursor:pointer;transition:all .15s}
-.upload-area:hover,.upload-area.drag{border-color:var(--blue);background:var(--blue-light)}
-.upload-area p{font-size:13px;color:var(--gray-5);margin-bottom:6px}
-.upload-area small{font-size:11px;color:var(--gray-4)}
-.doc-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--gray-2)}
-.doc-row:last-child{border-bottom:none}
-.doc-icon{font-size:18px;flex-shrink:0}
-.doc-name{flex:1;font-size:13px;color:var(--gray-6)}
-.doc-meta{font-size:11px;color:var(--gray-4)}
-.status-msg{font-size:12.5px;padding:8px 12px;border-radius:6px;margin-top:.75rem}
-.status-ok{background:var(--green-light);color:var(--green)}
-.status-err{background:var(--red-light);color:var(--red-mid)}
-.status-info{background:var(--blue-light);color:var(--blue-dark)}
-.progress-bar{height:4px;background:var(--gray-2);border-radius:2px;margin-top:8px;overflow:hidden}
-.progress-fill{height:4px;background:var(--blue);border-radius:2px;transition:width .3s}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinner{animation:spin 1s linear infinite;display:inline-block}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* ── HERO ── */
+.hero {
+  background: var(--text);
+  color: #f7f6f2;
+  padding: 3.5rem 2rem 3rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 40px,
+    rgba(255,255,255,0.02) 40px,
+    rgba(255,255,255,0.02) 41px
+  );
+}
+.hero-tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--teal-400);
+  background: rgba(29,158,117,0.12);
+  border: 1px solid rgba(29,158,117,0.3);
+  padding: 5px 14px;
+  border-radius: 99px;
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+.hero h1 {
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+  position: relative;
+}
+.hero h1 span { color: var(--teal-400); }
+.hero p {
+  font-size: 15px;
+  color: rgba(247,246,242,0.6);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.7;
+  position: relative;
+}
+
+/* ── FLOW CONTAINER ── */
+.flow {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+  position: relative;
+}
+
+/* vertical spine */
+.flow::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 3rem;
+  bottom: 4rem;
+  width: 1px;
+  background: var(--line);
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+/* ── NODE ── */
+.node-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.node {
+  width: 100%;
+  max-width: 340px;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1.5px solid var(--line);
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.node.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.node:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+}
+
+.node-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.node-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+}
+.node-sub {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text2);
+}
+.node-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
+}
+
+/* DETAIL PANEL */
+.node-detail {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+  width: 100%;
+  max-width: 340px;
+}
+.node-detail.open {
+  max-height: 300px;
+  opacity: 1;
+}
+.detail-inner {
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  padding: 1rem 1.5rem 1.25rem;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.7;
+}
+.node.open {
+  border-radius: 16px 16px 0 0;
+  border-bottom-color: transparent;
+}
+
+/* chevron */
+.chevron {
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px; height: 20px;
+  color: var(--gray-400);
+  transition: transform 0.3s ease, color 0.2s;
+}
+.node.open .chevron { transform: translateY(-50%) rotate(180deg); color: var(--text); }
+
+/* connector arrows */
+.connector {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  position: relative;
+}
+.connector svg { display: block; }
+
+/* ── CRITICAL NODE ── */
+.node.critical {
+  border-color: var(--amber-400);
+  background: var(--amber-50);
+}
+.node.critical:hover { box-shadow: 0 12px 32px rgba(186,117,23,0.15); }
+.critical-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--amber-600);
+  background: rgba(186,117,23,0.12);
+  border: 1px solid rgba(186,117,23,0.3);
+  padding: 3px 10px;
+  border-radius: 99px;
+  margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.critical-badge::before { content: '⚑'; font-size: 11px; }
+
+/* COLORS per node */
+.node.n-paciente { border-color: var(--gray-100); }
+.node.n-paciente .node-num { color: var(--gray-400); }
+.node.n-paciente .node-title { color: var(--gray-700); }
+
+.node.n-teal { border-color: #9fe1cb; }
+.node.n-teal .node-num { color: var(--teal-400); }
+.node.n-teal .node-title { color: var(--teal-700); }
+.node.n-teal:hover { border-color: var(--teal-400); }
+
+.node.n-purple { border-color: #afa9ec; }
+.node.n-purple .node-num { color: var(--purple-400); }
+.node.n-purple .node-title { color: var(--purple-700); }
+.node.n-purple:hover { border-color: var(--purple-400); }
+
+.node.n-coral { border-color: #f0997b; }
+.node.n-coral .node-num { color: var(--coral-400); }
+.node.n-coral .node-title { color: var(--coral-700); }
+.node.n-coral:hover { border-color: var(--coral-400); }
+
+.tag.teal { background: var(--teal-50); color: var(--teal-700); }
+.tag.purple { background: var(--purple-50); color: var(--purple-700); }
+.tag.amber { background: var(--amber-50); color: var(--amber-600); }
+.tag.coral { background: var(--coral-50); color: var(--coral-700); }
+.tag.gray { background: var(--gray-100); color: var(--gray-700); }
+
+/* return arrow */
+.return-banner {
+  margin-top: 1.5rem;
+  background: var(--coral-50);
+  border: 1.5px dashed var(--coral-400);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
+}
+.return-banner.visible { opacity: 1; transform: translateY(0); }
+.return-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--coral-400);
+  letter-spacing: 0.5px;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 4px;
+}
+.return-text {
+  font-size: 13px;
+  color: var(--coral-700);
+}
+
+/* transition animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 </style>
 </head>
 <body>
-<div class="page">
 
-<div class="header">
-  <h1>Administración — Literatura Clínica</h1>
-  <p>Suba documentos PDF o Word por categoría. El dashboard los usará para generar recomendaciones con IA.</p>
+<div class="hero">
+  <div class="hero-tag">MODELO DE TELEMEDICINA</div>
+  <h1>TeleSalud <span>Remota</span></h1>
+  <p>Atención médica especializada sin desplazamiento, disponible a lo largo de todo Chile.</p>
 </div>
 
-<!-- LOGIN PROFESIONAL -->
-<div class="card" id="login-card">
-  <div class="card-title">Identificación del profesional</div>
-  <p style="font-size:13px;color:var(--gray-5);margin-bottom:1rem">Sus documentos quedarán asociados a su nombre y solo se usarán cuando usted esté atendiendo.</p>
-  <input type="text" id="prof-name-input" placeholder="Ej: Dr. García" style="max-width:320px;border:1.5px solid var(--gray-2);border-radius:var(--radius-sm);padding:10px 13px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--gray-6);display:block;margin-bottom:.75rem">
-  <button class="btn btn-primary" onclick="iniciarAdmin()">Continuar</button>
-  <div id="login-admin-err" style="display:none;margin-top:.75rem;font-size:13px;color:var(--red-mid)">Por favor ingrese su nombre.</div>
-</div>
+<div class="flow" id="flow">
 
-<!-- CONTENIDO ADMIN (oculto hasta login) -->
-<div id="admin-content" style="display:none">
-
-<!-- SELECCIÓN DE MOTIVO -->
-<div class="card">
-  <div class="card-title">1 — Seleccione la categoría</div>
-  <div class="motivo-grid" id="motivo-grid"></div>
-</div>
-
-<!-- SUBIR DOCUMENTOS -->
-<div class="card" id="upload-card" style="display:none">
-  <div class="card-title" id="upload-card-title">2 — Documentos: —</div>
-
-  <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()"
-    ondragover="event.preventDefault();this.classList.add('drag')"
-    ondragleave="this.classList.remove('drag')"
-    ondrop="handleDrop(event)">
-    <p>Haga clic o arrastre archivos aquí</p>
-    <small>PDF o Word (.docx) · Máximo 10 MB por archivo</small>
+  <!-- PACIENTE -->
+  <div class="node-wrap" data-delay="0">
+    <div class="node n-paciente" onclick="toggle(this)">
+      <div class="node-num">INICIO</div>
+      <div class="node-title">Paciente</div>
+      <div class="node-sub">Llega al punto de atención local</div>
+      <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
+    </div>
+    <div class="node-detail">
+      <div class="detail-inner">
+        El paciente accede a un centro de baja complejidad ubicado en su localidad. No necesita desplazarse a un centro de mayor nivel para iniciar su evaluación médica.
+      </div>
+    </div>
   </div>
-  <input type="file" id="file-input" accept=".pdf,.docx" multiple style="display:none" onchange="handleFiles(this.files)">
 
-  <div id="progress-wrap" style="display:none">
-    <div class="status-msg status-info" id="progress-msg">Procesando…</div>
-    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="connector">
+    <svg width="24" height="36" viewBox="0 0 24 36"><line x1="12" y1="0" x2="12" y2="28" stroke="#c8c6bc" stroke-width="1.5"/><polyline points="6,22 12,30 18,22" fill="none" stroke="#c8c6bc" stroke-width="1.5" stroke-linejoin="round"/></svg>
   </div>
-  <div id="upload-status"></div>
-</div>
 
-<!-- DOCUMENTOS ACTUALES -->
-<div class="card" id="docs-card" style="display:none">
-  <div class="card-title" id="docs-card-title">Documentos guardados</div>
-  <div id="docs-list"></div>
-</div>
+  <!-- PASO 1 -->
+  <div class="node-wrap" data-delay="100">
+    <div class="node n-teal" onclick="toggle(this)">
+      <div class="node-num">PASO 01</div>
+      <div class="node-title">Punto de atención</div>
+      <div class="node-sub">Técnico paramédico · Evaluación inicial</div>
+      <div class="node-tags">
+        <span class="tag teal">Presencial</span>
+        <span class="tag teal">Baja complejidad</span>
+      </div>
+      <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
+    </div>
+    <div class="node-detail">
+      <div class="detail-inner">
+        Un técnico paramédico o enfermero/a recibe al paciente, realiza técnicas de enfermería básicas y solicita exámenes de laboratorio point-of-care disponibles en el mismo lugar.
+      </div>
+    </div>
+  </div>
 
-</div><!-- /admin-content -->
+  <div class="connector">
+    <svg width="24" height="36" viewBox="0 0 24 36"><line x1="12" y1="0" x2="12" y2="28" stroke="#c8c6bc" stroke-width="1.5"/><polyline points="6,22 12,30 18,22" fill="none" stroke="#c8c6bc" stroke-width="1.5" stroke-linejoin="round"/></svg>
+  </div>
+
+  <!-- PASO 2 -->
+  <div class="node-wrap" data-delay="200">
+    <div class="node n-teal" onclick="toggle(this)">
+      <div class="node-num">PASO 02</div>
+      <div class="node-title">Cuestionario clínico</div>
+      <div class="node-sub">Estructurado según motivo de consulta</div>
+      <div class="node-tags">
+        <span class="tag teal">Estructurado</span>
+        <span class="tag teal">Derivación dirigida</span>
+      </div>
+      <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
+    </div>
+    <div class="node-detail">
+      <div class="detail-inner">
+        El paciente responde un cuestionario clínico estandarizado según su motivo de consulta. Las respuestas determinan automáticamente a qué especialidad debe ser derivado.
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">
+    <svg width="24" height="36" viewBox="0 0 24 36"><line x1="12" y1="0" x2="12" y2="28" stroke="#c8c6bc" stroke-width="1.5"/><polyline points="6,22 12,30 18,22" fill="none" stroke="#c8c6bc" stroke-width="1.5" stroke-linejoin="round"/></svg>
+  </div>
+
+  <!-- PASO 3 -->
+  <div class="node-wrap" data-delay="300">
+    <div class="node n-teal" onclick="toggle(this)">
+      <div class="node-num">PASO 03</div>
+      <div class="node-title">Examen físico</div>
+      <div class="node-sub">Grabado en video · ECG · Rx · Laboratorio</div>
+      <div class="node-tags">
+        <span class="tag teal">Video</span>
+        <span class="tag teal">ECG · Rx</span>
+        <span class="tag teal">K⁺ · Na⁺ · Glicemia</span>
+      </div>
+      <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
+    </div>
+    <div class="node-detail">
+      <div class="detail-inner">
+        El examen físico es realizado por el técnico y grabado en video estructurado. Se complementa con electrocardiograma, radiografía portátil y exámenes de laboratorio point-of-care: potasio, sodio, glicemia, entre otros. Todo queda registrado en alta calidad.
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">
+    <svg width="24" height="36" viewBox="0 0 24 36"><line x1="12" y1="0" x2="12" y2="28" stroke="#c8c6bc" stroke-width="1.5"/><polyline points="6,22 12,30 18,22" fill="none" stroke="#c8c6bc" stroke-width="1.5" stroke-linejoin="round"/></svg>
+  </div>
+
+  <!-- PASO 4 -->
+  <div class="node-wrap" data-delay="400">
+    <div class="node n-purple" onclick="toggle(this)">
+      <div class="node-num">PASO 04</div>
+      <div class="node-title">Expediente en la nube</div>
+      <div class="node-sub">Toda la información disponible al especialista</div>
+      <div class="node-tags">
+        <span class="tag purple">Video · ECG · Rx</span>
+        <span class="tag purple">Laboratorio</span>
+        <span class="tag purple">Cuestionario</span>
+      </div>
+      <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
+    </div>
+    <div class="node-detail">
+      <div class="detail-inner">
+        Todos los registros quedan almacenados en la nube: video del examen físico, ECG, radiografía, resultados de laboratorio y cuestionario clínico. El expediente digital completo está disponible para el especialista en cualquier momento.
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">
+    <svg width="24" height="36" viewBox="0 0 24 36"><line x1="12" y1="0" x2="12" y2="28" stroke="#ba7517" stroke-width="1.5" stroke-dasharray="4 3"/><polyline points="6,22 12,30 18,22" fill="none" stroke="#ba7517" stroke-width="1.5" stroke-linejoin="round"/></svg>
+  </div>
+
+  <!-- PUNTO CRÍTICO -->
+  <div class="node-wrap" data-delay="500">
+    <div class="node critical" onclick="toggle(this)">
+      <div class="critical-badge">Punto crítico del modelo</div>
+      <div class="node-title" style="color:var(--amber-600)">Evaluación asincrónica</div>
+      <div class="node-sub" style="color:var(--amber-400)">El especialista accede al expediente cuando puede, desde cualquier lugar</div>
+      <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
+    </div>
+    <div class="node-detail">
+      <div class="detail-inner" style="border-color:#ba7517; background: var(--amber-50);">
+        La asincronía es la clave del modelo: el especialista no necesita estar disponible en el mismo momento que el paciente. Revisa el expediente completo cuando tiene tiempo, elimina las barreras de horario y geografía, y permite escalar el sistema a todo Chile.
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">
+    <svg width="24" height="36" viewBox="0 0 24 36"><line x1="12" y1="0" x2="12" y2="28" stroke="#c8c6bc" stroke-width="1.5"/><polyline points="6,22 12,30 18,22" fill="none" stroke="#c8c6bc" stroke-width="1.5" stroke-linejoin="round"/></svg>
+  </div>
+
+  <!-- ESPECIALISTA -->
+  <div class="node-wrap" data-delay="600">
+    <div class="node n-coral" onclick="toggle(this)">
+      <div class="node-num">RESULTADO</div>
+      <div class="node-title">Especialista</div>
+      <div class="node-sub">Revisa el caso completo · Emite diagnóstico y tratamiento</div>
+      <div class="node-tags">
+        <span class="tag coral">Diagnóstico</span>
+        <span class="tag coral">Tratamiento</span>
+        <span class="tag coral">Opinión clínica</span>
+      </div>
+      <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
+    </div>
+    <div class="node-detail">
+      <div class="detail-inner">
+        El especialista recibe una notificación, revisa el expediente completo — video, imágenes, exámenes y cuestionario — y entrega su opinión, diagnóstico y plan de tratamiento directamente al paciente.
+      </div>
+    </div>
+  </div>
+
+  <!-- RETORNO AL PACIENTE -->
+  <div class="return-banner" id="returnBanner">
+    <div class="return-label">↩ Retorno al paciente</div>
+    <div class="return-text">Opinión · Diagnóstico · Tratamiento — sin desplazamiento</div>
+  </div>
 
 </div>
 
 <script>
-const MOTIVOS = {
-  cefalea:    'Cefalea',
-  insomnio:   'Insomnio',
-  tdah:       'Atención / TDAH',
-  tea:        'Trastorno del Espectro Autista',
-  depresion:  'Estado de ánimo bajo / Depresión',
-  ansiedad:   'Ansiedad',
-  mareos:     'Mareos / Vértigo',
-  memoria:    'Problemas de memoria',
-  seguimiento:'Seguimiento / medicación'
-};
-
-let motivoActual = null;
-let docCounts = {};
-let profKey = '';
-let profNombre = '';
-
-function iniciarAdmin(){
-  const nombre = document.getElementById('prof-name-input').value.trim();
-  if(!nombre){ document.getElementById('login-admin-err').style.display=''; return; }
-  profNombre = nombre;
-  profKey = nombre.toLowerCase().replace(/[^a-z0-9áéíóúñü]/g,'_');
-  document.getElementById('login-card').style.display = 'none';
-  document.getElementById('admin-content').style.display = 'block';
-  document.querySelector('.header p').textContent = `Profesional: ${profNombre} · Sus documentos son independientes de otros profesionales.`;
-  init();
-}
-
-async function init(){
-  const grid = document.getElementById('motivo-grid');
-  for(const [key] of Object.entries(MOTIVOS)){
-    try {
-      const snap = await firebase.database().ref('literatura/'+profKey+'/'+key).get();
-      docCounts[key] = snap.exists() ? Object.keys(snap.val()).length : 0;
-    } catch(e){ docCounts[key] = 0; }
-  }
-  renderGrid();
-}
-
-function renderGrid(){
-  const grid = document.getElementById('motivo-grid');
-  grid.innerHTML = Object.entries(MOTIVOS).map(([key, label]) => {
-    const n = docCounts[key]||0;
-    return `<div class="motivo-card${motivoActual===key?' active':''}" onclick="selMotivo('${key}')">
-      <div class="motivo-name">${label}</div>
-      <div class="motivo-count${n>0?' has-docs':''}">${n>0?n+' documento'+(n>1?'s':'')+' cargado'+(n>1?'s':''):'Sin documentos'}</div>
-    </div>`;
-  }).join('');
-}
-
-function selMotivo(key){
-  motivoActual = key;
-  renderGrid();
-  document.getElementById('upload-card').style.display = '';
-  document.getElementById('upload-card-title').textContent = '2 — Documentos: '+MOTIVOS[key];
-  document.getElementById('upload-status').innerHTML = '';
-  document.getElementById('progress-wrap').style.display = 'none';
-  cargarDocsActuales(key);
-}
-
-async function cargarDocsActuales(key){
-  const card = document.getElementById('docs-card');
-  const list = document.getElementById('docs-list');
-  const title = document.getElementById('docs-card-title');
-  card.style.display = '';
-  title.textContent = 'Documentos guardados — '+MOTIVOS[key];
-  list.innerHTML = '<div style="font-size:13px;color:var(--gray-4);padding:.5rem 0">Cargando…</div>';
-  try {
-    const snap = await firebase.database().ref('literatura/'+profKey+'/'+key).get();
-    if(!snap.exists()){ list.innerHTML='<div style="font-size:13px;color:var(--gray-4);padding:.5rem 0">No hay documentos aún.</div>'; return; }
-    const docs = [];
-    snap.forEach(child=>docs.push({_key:child.key,...child.val()}));
-    list.innerHTML = docs.map(doc=>`
-      <div class="doc-row">
-        <div class="doc-icon">${doc.tipo==='pdf'?'📄':'📝'}</div>
-        <div>
-          <div class="doc-name">${doc.nombre}</div>
-          <div class="doc-meta">${doc.tipo?.toUpperCase()||'DOC'} · ${doc.chars||0} caracteres · ${doc.fecha||'—'}</div>
-        </div>
-        <button class="btn btn-danger btn-sm" onclick="eliminarDoc('${key}','${doc._key}','${doc.nombre.replace(/'/g,"\\'")}')">Eliminar</button>
-      </div>`).join('');
-  } catch(e){
-    list.innerHTML=`<div style="font-size:13px;color:var(--red-mid)">Error: ${e.message}</div>`;
-  }
-}
-
-async function eliminarDoc(motivo, key, nombre){
-  if(!confirm('¿Eliminar "'+nombre+'"?')) return;
-  await firebase.database().ref('literatura/'+profKey+'/'+motivo+'/'+key).remove();
-  docCounts[motivo] = Math.max(0,(docCounts[motivo]||1)-1);
-  renderGrid();
-  cargarDocsActuales(motivo);
-}
-
-function handleDrop(e){
-  e.preventDefault();
-  document.getElementById('upload-area').classList.remove('drag');
-  handleFiles(e.dataTransfer.files);
-}
-
-async function handleFiles(files){
-  if(!motivoActual){ alert('Seleccione una categoría primero.'); return; }
-  const arr = Array.from(files).filter(f=>f.name.endsWith('.pdf')||f.name.endsWith('.docx'));
-  if(arr.length===0){ showStatus('Solo se aceptan archivos PDF o Word (.docx).','err'); return; }
-
-  const progWrap = document.getElementById('progress-wrap');
-  const progMsg  = document.getElementById('progress-msg');
-  const progFill = document.getElementById('progress-fill');
-  progWrap.style.display = '';
-  document.getElementById('upload-status').innerHTML = '';
-
-  for(let i=0; i<arr.length; i++){
-    const file = arr[i];
-    progMsg.innerHTML = `<span class="spinner">⟳</span> Procesando ${i+1}/${arr.length}: ${file.name}`;
-    progFill.style.width = Math.round(((i)/arr.length)*100)+'%';
-
-    try {
-      // Extraer texto del archivo
-      let texto = '';
-      if(file.name.endsWith('.pdf')){
-        texto = await extraerTextoPDF(file);
-      } else {
-        texto = await extraerTextoDocx(file);
-      }
-
-      // Guardar en Firebase bajo la clave del profesional
-      const ref = firebase.database().ref('literatura/'+profKey+'/'+motivoActual).push();
-      await ref.set({
-        nombre: file.name,
-        tipo:   file.name.endsWith('.pdf')?'pdf':'docx',
-        texto:  texto.slice(0, 50000),
-        chars:  texto.length,
-        fecha:  new Date().toLocaleDateString('es-CL')
-      });
-      docCounts[motivoActual] = (docCounts[motivoActual]||0)+1;
-
-    } catch(e){
-      showStatus('Error con "'+file.name+'": '+e.message,'err');
-    }
-  }
-
-  progFill.style.width = '100%';
-  progMsg.innerHTML = '✓ Completado';
-  setTimeout(()=>{ progWrap.style.display='none'; },2000);
-  showStatus(arr.length+' documento'+(arr.length>1?'s':'')+' guardado'+(arr.length>1?'s':'')+' correctamente.','ok');
-  renderGrid();
-  cargarDocsActuales(motivoActual);
-  document.getElementById('file-input').value='';
-}
-
-// Extraer texto de PDF usando pdf.js
-async function extraerTextoPDF(file){
-  if(!window.pdfjsLib){
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
-    window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-  }
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await window.pdfjsLib.getDocument({data:arrayBuffer}).promise;
-  let texto = '';
-  for(let i=1;i<=Math.min(pdf.numPages,30);i++){
-    const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    texto += content.items.map(item=>item.str).join(' ')+'\n';
-  }
-  return texto.trim();
-}
-
-// Extraer texto de DOCX usando mammoth
-async function extraerTextoDocx(file){
-  if(!window.mammoth){
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
-  }
-  const arrayBuffer = await file.arrayBuffer();
-  const result = await window.mammoth.extractRawText({arrayBuffer});
-  return result.value.trim();
-}
-
-function loadScript(src){
-  return new Promise((res,rej)=>{
-    const s=document.createElement('script');
-    s.src=src; s.onload=res; s.onerror=rej;
-    document.head.appendChild(s);
+function toggle(node) {
+  const detail = node.nextElementSibling;
+  const isOpen = node.classList.contains('open');
+  document.querySelectorAll('.node.open').forEach(n => {
+    n.classList.remove('open');
+    n.nextElementSibling.classList.remove('open');
   });
+  if (!isOpen) {
+    node.classList.add('open');
+    detail.classList.add('open');
+  }
 }
 
-function showStatus(msg, type){
-  document.getElementById('upload-status').innerHTML=`<div class="status-msg status-${type==='ok'?'ok':type==='err'?'err':'info'}">${msg}</div>`;
-}
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const delay = entry.target.dataset.delay || 0;
+      setTimeout(() => {
+        const node = entry.target.querySelector('.node');
+        if (node) node.classList.add('visible');
+      }, parseInt(delay));
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
 
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('prof-name-input').addEventListener('keydown', e=>{ if(e.key==='Enter') iniciarAdmin(); });
-});
+document.querySelectorAll('.node-wrap').forEach(w => observer.observe(w));
+
+const bannerObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), 400);
+      bannerObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+bannerObserver.observe(document.getElementById('returnBanner'));
 </script>
 </body>
 </html>
