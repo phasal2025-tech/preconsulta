@@ -3,685 +3,1012 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TeleSalud Remota</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>TeleSalud Remota — Simulación</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #f7f6f2;
+  --bg: #f0ede6;
+  --teal: #1d9e75; --teal-d: #085041; --teal-l: #e1f5ee; --teal-m: #5dcaa5;
+  --purple: #7f77dd; --purple-d: #3c3489; --purple-l: #eeedfe;
+  --amber: #ba7517; --amber-l: #faeeda;
+  --coral: #d85a30; --coral-l: #faece7;
+  --gray: #444441; --gray2: #888780; --gray3: #c8c6bc; --gray4: #f1efe8;
   --surface: #ffffff;
-  --teal-50: #e1f5ee; --teal-200: #5dcaa5; --teal-400: #1d9e75; --teal-700: #085041;
-  --purple-50: #eeedfe; --purple-200: #afa9ec; --purple-400: #7f77dd; --purple-700: #3c3489;
-  --amber-50: #faeeda; --amber-200: #ef9f27; --amber-400: #ba7517; --amber-600: #854f0b;
-  --coral-50: #faece7; --coral-200: #f0997b; --coral-400: #d85a30; --coral-700: #712b13;
-  --blue-50: #e6f1fb; --blue-400: #378add; --blue-700: #0c447c;
-  --gray-50: #f1efe8; --gray-100: #d3d1c7; --gray-400: #888780; --gray-700: #444441;
-  --text: #1a1a18; --text2: #5a5a56; --line: #c8c6bc;
+  --text: #1a1a18;
+  --green-wa: #25D366; --green-wa-d: #075E54;
+  --radius: 16px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.10);
 }
+
 html { scroll-behavior: smooth; }
 body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-/* HERO */
-.hero {
+/* ── HEADER ── */
+.header {
   background: #111410; color: #f7f6f2;
-  padding: 3.5rem 2rem 3rem; text-align: center; position: relative; overflow: hidden;
+  padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
 }
-.hero::before {
-  content: ''; position: absolute; inset: 0;
-  background: repeating-linear-gradient(-45deg, transparent, transparent 40px, rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 41px);
+.header-brand { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+.header-brand span { color: var(--teal-m); }
+.header-case {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: rgba(247,246,242,0.5); letter-spacing: 1px;
 }
-.hero-tag {
-  display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 11px;
-  letter-spacing: 2px; color: var(--teal-400); background: rgba(29,158,117,0.12);
-  border: 1px solid rgba(29,158,117,0.3); padding: 5px 14px; border-radius: 99px;
-  margin-bottom: 1.25rem; position: relative;
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--teal);
+  display: inline-block; margin-right: 6px;
+  animation: pulse-dot 2s ease-in-out infinite;
 }
-.hero h1 { font-size: clamp(28px,5vw,44px); font-weight: 700; letter-spacing: -1px; line-height: 1.1; margin-bottom: 0.75rem; position: relative; }
-.hero h1 span { color: var(--teal-400); }
-.hero p { font-size: 15px; color: rgba(247,246,242,0.55); max-width: 480px; margin: 0 auto; line-height: 1.7; position: relative; }
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
 
-/* FLOW */
-.flow { max-width: 580px; margin: 0 auto; padding: 3rem 1.5rem 4rem; position: relative; }
-.flow::before {
-  content: ''; position: absolute; left: 50%; top: 3rem; bottom: 4rem;
-  width: 1px; background: var(--line); transform: translateX(-50%); z-index: 0;
+/* ── ROLE SWITCHER ── */
+.role-switcher {
+  display: flex; gap: 0; background: #1e1e1a; border-radius: 99px;
+  padding: 4px; margin: 1.5rem auto; max-width: 360px;
+}
+.role-btn {
+  flex: 1; padding: 10px 0; border: none; border-radius: 99px; cursor: pointer;
+  font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 600;
+  transition: all 0.25s ease; background: transparent; color: rgba(247,246,242,0.4);
+}
+.role-btn.active { background: var(--surface); color: var(--text); }
+.role-btn.active.tecnico { color: var(--teal-d); }
+.role-btn.active.medico { color: var(--purple-d); }
+
+/* ── VIEWS ── */
+.view { display: none; padding: 0 1rem 3rem; max-width: 560px; margin: 0 auto; }
+.view.active { display: block; }
+
+/* ── DEVICE FRAME (médico) ── */
+.phone-frame {
+  width: 320px; margin: 0 auto;
+  background: #1a1a18; border-radius: 36px; padding: 14px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+}
+.phone-screen {
+  background: var(--green-wa-d); border-radius: 24px; overflow: hidden;
+  min-height: 560px; display: flex; flex-direction: column;
 }
 
-/* NODE WRAP */
-.node-wrap { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
-
-.node {
-  width: 100%; max-width: 420px;
-  background: var(--surface); border-radius: 18px; border: 1.5px solid var(--line);
-  overflow: hidden; cursor: pointer; position: relative;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  opacity: 0; transform: translateY(24px);
+/* ── SECTION HEADERS ── */
+.section-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 99px; display: inline-block; margin-bottom: 10px;
 }
-.node.visible { opacity: 1; transform: translateY(0); transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
-.node:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(0,0,0,0.09); }
-.node.open { border-radius: 18px 18px 0 0; border-bottom-color: transparent; }
+.section-label.teal { background: var(--teal-l); color: var(--teal-d); }
+.section-label.purple { background: var(--purple-l); color: var(--purple-d); }
+.section-label.amber { background: var(--amber-l); color: var(--amber); }
 
-/* ILLUSTRATION AREA */
-.node-illustration {
-  width: 100%; height: 120px; position: relative; overflow: hidden;
+/* ── CARD ── */
+.card {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 1.25rem; margin-bottom: 1rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border: 1.5px solid var(--gray3);
+}
+.card-title {
+  font-size: 14px; font-weight: 700; margin-bottom: 0.5rem; color: var(--text);
+}
+.card-sub { font-size: 12px; color: var(--gray2); line-height: 1.6; }
+
+/* ── PATIENT CARD ── */
+.patient-card {
+  background: linear-gradient(135deg, var(--teal-d), #0d6b57);
+  color: white; border-radius: var(--radius); padding: 1.25rem;
+  margin-bottom: 1rem; position: relative; overflow: hidden;
+}
+.patient-card::after {
+  content: ''; position: absolute; right: -20px; top: -20px;
+  width: 100px; height: 100px; border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+}
+.patient-name { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+.patient-meta { font-size: 12px; opacity: 0.7; font-family: 'JetBrains Mono', monospace; }
+.patient-badges { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.badge {
+  font-size: 10px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  padding: 3px 10px; border-radius: 99px; letter-spacing: 0.5px;
+}
+.badge.white { background: rgba(255,255,255,0.2); color: white; }
+.badge.teal { background: var(--teal-l); color: var(--teal-d); }
+.badge.amber { background: var(--amber-l); color: var(--amber); }
+.badge.coral { background: var(--coral-l); color: var(--coral); }
+.badge.purple { background: var(--purple-l); color: var(--purple-d); }
+.badge.green { background: #dcf8c6; color: #075E54; }
+
+/* ── FORM ── */
+.form-group { margin-bottom: 1rem; }
+.form-label {
+  font-size: 11px; font-weight: 700; color: var(--gray2);
+  letter-spacing: 0.5px; text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+  display: block; margin-bottom: 6px;
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 10px 14px; border-radius: 10px;
+  border: 1.5px solid var(--gray3); background: var(--gray4);
+  font-family: 'Sora', sans-serif; font-size: 13px; color: var(--text);
+  transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none; border-color: var(--teal); background: white;
+}
+.form-textarea { resize: none; height: 70px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── VITALS GRID ── */
+.vitals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1rem; }
+.vital-box {
+  background: var(--gray4); border-radius: 10px; padding: 10px 8px;
+  text-align: center; border: 1.5px solid var(--gray3);
+}
+.vital-val {
+  font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 600;
+  color: var(--teal-d); display: block; line-height: 1;
+}
+.vital-unit { font-size: 9px; color: var(--gray2); display: block; margin-top: 2px; }
+.vital-label { font-size: 10px; color: var(--gray); margin-top: 4px; display: block; font-weight: 600; }
+
+/* ── RECORDING AREA ── */
+.recording-area {
+  background: #111; border-radius: 12px; padding: 1rem;
+  margin-bottom: 1rem; text-align: center; position: relative; overflow: hidden;
+}
+.rec-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: rgba(255,255,255,0.5); letter-spacing: 1px; margin-bottom: 8px;
+}
+.rec-dot {
+  width: 10px; height: 10px; background: #ef4444; border-radius: 50%;
+  display: inline-block; margin-right: 6px;
+  animation: blink 1.2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+.rec-timer {
+  font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 600;
+  color: white; display: block; margin: 8px 0;
+}
+.waveform { display: flex; align-items: center; justify-content: center; gap: 3px; height: 28px; }
+.wave-bar {
+  width: 3px; border-radius: 2px; background: var(--teal-m);
+  animation: wave 0.8s ease-in-out infinite;
+}
+@keyframes wave { 0%,100%{transform:scaleY(0.3)} 50%{transform:scaleY(1)} }
+
+/* ── PROGRESS STEPS ── */
+.steps { display: flex; gap: 0; margin-bottom: 1.5rem; }
+.step {
+  flex: 1; text-align: center; position: relative;
+  padding-top: 28px;
+}
+.step::before {
+  content: ''; position: absolute; top: 10px; left: 50%; right: -50%;
+  height: 2px; background: var(--gray3); z-index: 0;
+}
+.step:last-child::before { display: none; }
+.step-dot {
+  position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
+  width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--gray3);
+  background: var(--bg); z-index: 1; transition: all 0.3s;
+}
+.step.done .step-dot { background: var(--teal); border-color: var(--teal); }
+.step.active .step-dot { background: white; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(29,158,117,0.2); }
+.step-text { font-size: 9px; font-family: 'JetBrains Mono', monospace; color: var(--gray2); letter-spacing: 0.3px; }
+.step.done .step-text, .step.active .step-text { color: var(--teal-d); font-weight: 600; }
+
+/* ── BUTTONS ── */
+.btn {
+  width: 100%; padding: 13px; border: none; border-radius: 12px;
+  font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; margin-bottom: 8px; letter-spacing: -0.2px;
+}
+.btn-primary { background: var(--teal); color: white; }
+.btn-primary:hover { background: var(--teal-d); transform: translateY(-1px); }
+.btn-primary:disabled { background: var(--gray3); color: var(--gray2); cursor: not-allowed; transform: none; }
+.btn-secondary { background: var(--gray4); color: var(--gray); border: 1.5px solid var(--gray3); }
+.btn-purple { background: var(--purple); color: white; }
+.btn-purple:hover { background: var(--purple-d); transform: translateY(-1px); }
+.btn-amber { background: var(--amber); color: white; }
+.btn-amber:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-call { background: var(--green-wa); color: white; font-size: 16px; padding: 15px; }
+.btn-call:hover { background: #1ea956; transform: translateY(-1px); }
+.btn-sm {
+  width: auto; padding: 8px 16px; font-size: 12px; border-radius: 8px;
+  border: none; cursor: pointer; font-family: 'Sora', sans-serif; font-weight: 600;
+  transition: all 0.2s;
+}
+
+/* ── ECG STRIP ── */
+.ecg-strip {
+  background: #0a1f0a; border-radius: 10px; padding: 10px 14px;
+  margin-bottom: 1rem; overflow: hidden;
+}
+.ecg-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #4ade80; opacity: 0.6; margin-bottom: 4px; }
+.ecg-line { width: 100%; }
+
+/* ── LAB RESULTS ── */
+.lab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+.lab-item {
+  background: var(--gray4); border-radius: 10px; padding: 10px 12px;
+  border: 1.5px solid var(--gray3);
+}
+.lab-name { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--gray2); }
+.lab-value { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; color: var(--text); }
+.lab-range { font-size: 10px; color: var(--gray2); }
+.lab-item.abnormal { border-color: #fca5a5; background: #fff5f5; }
+.lab-item.abnormal .lab-value { color: #dc2626; }
+.lab-item.abnormal .lab-name::after { content: ' ↑'; color: #dc2626; }
+
+/* ── WHATSAPP UI ── */
+.wa-topbar {
+  background: #1a5c4a; padding: 12px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.wa-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--teal); display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.wa-name { font-size: 13px; font-weight: 700; color: white; }
+.wa-status { font-size: 11px; color: rgba(255,255,255,0.6); }
+.wa-back { color: rgba(255,255,255,0.8); font-size: 18px; margin-right: 2px; cursor: pointer; }
+.wa-messages { flex: 1; background: #e5ddd5; padding: 12px 10px; overflow-y: auto; }
+.wa-msg {
+  max-width: 80%; border-radius: 10px; padding: 8px 12px;
+  margin-bottom: 8px; font-size: 12px; line-height: 1.5; position: relative;
+}
+.wa-msg.recv { background: white; border-radius: 0 10px 10px 10px; align-self: flex-start; }
+.wa-msg.sent { background: #dcf8c6; border-radius: 10px 10px 0 10px; margin-left: auto; }
+.wa-msg-time { font-size: 10px; color: var(--gray2); text-align: right; margin-top: 2px; }
+.wa-msg-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: var(--teal-d); }
+.wa-notif {
+  background: white; border-left: 4px solid var(--green-wa);
+  border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.wa-input-bar {
+  background: #f0f0f0; padding: 8px 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.wa-input {
+  flex: 1; background: white; border-radius: 20px; border: none;
+  padding: 8px 14px; font-size: 13px; font-family: 'Sora', sans-serif;
+}
+.wa-send {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--green-wa);
+  border: none; color: white; cursor: pointer; font-size: 14px;
   display: flex; align-items: center; justify-content: center;
 }
 
-/* NODE BODY */
-.node-body { padding: 1.1rem 1.4rem 1.2rem; }
-.node-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 1.5px; margin-bottom: 5px; }
-.node-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.3px; }
-.node-sub { font-size: 13px; line-height: 1.55; color: var(--text2); }
-.node-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
-.tag { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 99px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.3px; }
-.tag.teal { background: var(--teal-50); color: var(--teal-700); }
-.tag.purple { background: var(--purple-50); color: var(--purple-700); }
-.tag.amber { background: var(--amber-50); color: var(--amber-600); }
-.tag.coral { background: var(--coral-50); color: var(--coral-700); }
-.tag.blue { background: var(--blue-50); color: var(--blue-700); }
-.tag.gray { background: var(--gray-50); color: var(--gray-700); }
-
-/* chevron */
-.chevron { position: absolute; right: 1.1rem; bottom: 1.2rem; width: 18px; height: 18px; color: var(--gray-400); transition: transform 0.3s ease, color 0.2s; }
-.node.open .chevron { transform: rotate(180deg); color: var(--text); }
-
-/* DETAIL */
-.node-detail { max-height: 0; overflow: hidden; transition: max-height 0.45s ease, opacity 0.35s ease; opacity: 0; width: 100%; max-width: 420px; }
-.node-detail.open { max-height: 600px; opacity: 1; }
-.detail-inner { background: var(--surface); border: 1.5px solid var(--line); border-top: none; border-radius: 0 0 18px 18px; padding: 1rem 1.4rem 1.3rem; font-size: 13px; color: var(--text2); line-height: 1.75; }
-.detail-inner ul { padding-left: 1.1rem; margin-top: 6px; }
-.detail-inner li { margin-bottom: 4px; }
-
-/* CONNECTOR */
-.connector { height: 38px; display: flex; align-items: center; justify-content: center; z-index: 1; position: relative; }
-
-/* CRITICAL */
-.node.critical { border-color: var(--amber-400); }
-.node.critical:hover { box-shadow: 0 14px 36px rgba(186,117,23,0.15); }
-.critical-badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-  color: var(--amber-600); background: rgba(186,117,23,0.1); border: 1px solid rgba(186,117,23,0.3);
-  padding: 3px 10px; border-radius: 99px; margin-bottom: 8px;
-  font-family: 'JetBrains Mono', monospace;
+/* ── VIDEO PLAYER (médico) ── */
+.video-player {
+  background: #111; border-radius: 12px; overflow: hidden; margin-bottom: 1rem;
 }
-
-/* COLOR VARIANTS */
-.node.n-teal { border-color: #9fe1cb; }
-.node.n-teal .node-num { color: var(--teal-400); }
-.node.n-teal .node-title { color: var(--teal-700); }
-.node.n-teal:hover { border-color: var(--teal-400); }
-.node.n-purple { border-color: var(--purple-200); }
-.node.n-purple .node-num { color: var(--purple-400); }
-.node.n-purple .node-title { color: var(--purple-700); }
-.node.n-purple:hover { border-color: var(--purple-400); }
-.node.n-coral { border-color: var(--coral-200); }
-.node.n-coral .node-num { color: var(--coral-400); }
-.node.n-coral .node-title { color: var(--coral-700); }
-.node.n-coral:hover { border-color: var(--coral-400); }
-.node.n-gray .node-num { color: var(--gray-400); }
-.node.n-gray .node-title { color: var(--gray-700); }
-
-/* PHASE BLOCKS */
-.phase-block {
-  position: relative; width: 100%; max-width: 480px; margin: 0 auto;
-  padding: 1.5rem 1rem 1.2rem;
-  border-radius: 24px;
+.video-screen {
+  background: linear-gradient(135deg, #1a0a1a, #0a1a0a);
+  height: 160px; display: flex; align-items: center; justify-content: center;
+  position: relative;
 }
-.phase-block.phase-teal {
-  background: linear-gradient(160deg, rgba(29,158,117,0.07) 0%, rgba(225,245,238,0.5) 100%);
-  border: 1.5px solid rgba(29,158,117,0.22);
+.video-person {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: rgba(127,119,221,0.5); display: flex; align-items: center;
+  justify-content: center; font-size: 28px;
 }
-.phase-block.phase-purple {
-  background: linear-gradient(160deg, rgba(127,119,221,0.08) 0%, rgba(238,237,254,0.5) 100%);
-  border: 1.5px solid rgba(127,119,221,0.25);
+.video-overlay {
+  position: absolute; inset: 0; display: flex; align-items: flex-start;
+  justify-content: space-between; padding: 8px 10px;
 }
-.phase-block.phase-coral {
-  background: linear-gradient(160deg, rgba(216,90,48,0.07) 0%, rgba(250,236,231,0.5) 100%);
-  border: 1.5px solid rgba(216,90,48,0.22);
-}
-.phase-label {
+.video-rec { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: white; display: flex; align-items: center; gap: 4px; }
+.video-controls {
+  background: #1a1a1a; padding: 8px 12px;
   display: flex; align-items: center; gap: 8px;
-  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
-  letter-spacing: 2px; text-transform: uppercase;
-  padding: 5px 14px; border-radius: 99px;
-  width: fit-content; margin: 0 auto 1.1rem auto;
 }
-.phase-label.teal { background: rgba(29,158,117,0.12); color: var(--teal-700); border: 1px solid rgba(29,158,117,0.28); }
-.phase-label.purple { background: rgba(127,119,221,0.12); color: var(--purple-700); border: 1px solid rgba(127,119,221,0.28); }
-.phase-label.coral { background: rgba(216,90,48,0.12); color: var(--coral-700); border: 1px solid rgba(216,90,48,0.28); }
-.phase-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.phase-dot.teal { background: var(--teal-400); }
-.phase-dot.purple { background: var(--purple-400); }
-.phase-dot.coral { background: var(--coral-400); }
-.phase-block .node-wrap { margin-bottom: 0; }
-.phase-block .connector { height: 24px; }
-.phase-gap {
-  height: 52px; display: flex; align-items: center; justify-content: center;
-  position: relative; z-index: 2; width: 100%; max-width: 480px; margin: 0 auto;
-}
+.video-progress-bg { flex: 1; height: 4px; background: #333; border-radius: 2px; }
+.video-progress { height: 4px; background: var(--purple); border-radius: 2px; transition: width 0.5s; }
+.video-time { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #888; white-space: nowrap; }
+.play-btn { background: none; border: none; color: white; cursor: pointer; font-size: 18px; padding: 0; }
 
-/* RETURN BANNER */
-.return-banner {
-  margin-top: 1.5rem; background: var(--coral-50); border: 1.5px dashed var(--coral-400);
-  border-radius: 14px; padding: 1rem 1.25rem; text-align: center;
-  opacity: 0; transform: translateY(10px);
-  transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
+/* ── NOTIFICATION TOAST ── */
+.toast {
+  position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-20px);
+  background: #1a1a18; color: white; padding: 12px 20px; border-radius: 12px;
+  font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  opacity: 0; transition: all 0.4s; z-index: 200; white-space: nowrap;
+  display: flex; align-items: center; gap: 8px;
 }
-.return-banner.visible { opacity: 1; transform: translateY(0); }
-.return-label { font-size: 11px; font-weight: 700; color: var(--coral-400); letter-spacing: 1px; font-family: 'JetBrains Mono', monospace; margin-bottom: 4px; }
-.return-text { font-size: 13px; color: var(--coral-700); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ANIMATIONS */
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-@keyframes spin { to{transform:rotate(360deg)} }
-@keyframes wave { 0%,100%{transform:scaleY(0.4)} 50%{transform:scaleY(1)} }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
-@keyframes scroll-data { from{transform:translateY(0)} to{transform:translateY(-50%)} }
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--gray3); margin: 1rem 0; }
+
+/* ── STATUS PILL ── */
+.status-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+  padding: 5px 12px; border-radius: 99px; letter-spacing: 0.3px;
+}
+.status-pill.waiting { background: var(--amber-l); color: var(--amber); }
+.status-pill.ready { background: var(--teal-l); color: var(--teal-d); }
+.status-pill.done { background: #dcf8c6; color: #075E54; }
+
+/* ── CHECKLIST ── */
+.checklist { list-style: none; }
+.checklist li {
+  display: flex; align-items: center; gap: 8px; padding: 8px 0;
+  border-bottom: 1px solid var(--gray4); font-size: 13px;
+}
+.checklist li:last-child { border-bottom: none; }
+.check-icon {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 11px;
+}
+.check-icon.done { background: var(--teal); color: white; }
+.check-icon.pending { background: var(--gray4); border: 2px solid var(--gray3); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+.animate-in { animation: fadeIn 0.4s ease forwards; }
+
+/* ── HELPERS ── */
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.flex { display: flex; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.gap-1 { gap: 0.5rem; }
+.text-sm { font-size: 12px; color: var(--gray2); }
+.text-mono { font-family: 'JetBrains Mono', monospace; }
+.hidden { display: none !important; }
+
+/* phone screen states */
+.phone-screen-inner { display: none; flex-direction: column; flex: 1; }
+.phone-screen-inner.active { display: flex; }
 </style>
 </head>
 <body>
 
-<div class="hero">
-  <div class="hero-tag">MODELO DE TELEMEDICINA</div>
-  <h1>TeleSalud <span>Remota</span></h1>
-  <p>Atención médica especializada sin desplazamiento, disponible a lo largo de todo Chile.</p>
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">TeleSalud <span>Remota</span></div>
+  <div class="header-case"><span class="status-dot"></span>CASO #2847</div>
 </div>
 
-<div class="flow" id="flow">
+<!-- TOAST -->
+<div class="toast" id="toast">🔔 Notificación enviada al médico</div>
 
-  <!-- FASE 1 -->
-  <div class="phase-block phase-teal">
-    <div class="phase-label teal"><span class="phase-dot teal"></span>Fase 1 — Paciente &amp; Punto de Atención</div>
+<!-- ROLE SWITCHER -->
+<div class="role-switcher">
+  <button class="role-btn tecnico active" onclick="switchRole('tecnico')">🩺 Técnico/a</button>
+  <button class="role-btn medico" onclick="switchRole('medico')">👨‍⚕️ Médico</button>
+</div>
 
-    <!-- PACIENTE -->
-    <div class="node-wrap" data-delay="0">
-      <div class="node n-teal" onclick="toggle(this)">
-        <div class="node-illustration" style="background:linear-gradient(120deg,#e1f5ee 60%,#c5f0df 100%);">
-          <svg width="340" height="120" viewBox="0 0 340 120">
-            <path d="M152 8 Q155 18 153 32 Q150 46 151 60 Q149 74 150 88 Q151 100 152 112" stroke="#9fe1cb" stroke-width="3" fill="none" stroke-linecap="round"/>
-            <circle cx="152" cy="14" r="5.5" fill="#1d9e75" opacity="0.95"/>
-            <circle cx="151" cy="32" r="4.5" fill="#1d9e75" opacity="0.85"/>
-            <circle cx="151" cy="50" r="4.5" fill="#1d9e75" opacity="0.80"/>
-            <circle cx="150" cy="68" r="4.5" fill="#1d9e75" opacity="0.75"/>
-            <circle cx="150" cy="84" r="4" fill="#1d9e75" opacity="0.65"/>
-            <circle cx="151" cy="100" r="3.5" fill="#1d9e75" opacity="0.55"/>
-            <circle cx="152" cy="14" r="11" fill="none" stroke="#1d9e75" stroke-width="1.2" opacity="0.4" style="animation:pulse 2s ease-in-out infinite"/>
-            <circle cx="152" cy="14" r="18" fill="none" stroke="#1d9e75" stroke-width="0.6" opacity="0.2" style="animation:pulse 2s ease-in-out infinite 0.5s"/>
-            <text x="136" y="16" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="7.5" fill="#1d9e75" opacity="0.9">Arica</text>
-            <text x="136" y="34" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="7" fill="#1d9e75" opacity="0.7">Antofagasta</text>
-            <text x="136" y="52" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="7" fill="#1d9e75" opacity="0.7">La Serena</text>
-            <text x="136" y="70" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="7" fill="#1d9e75" opacity="0.7">Santiago</text>
-            <text x="136" y="86" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="7" fill="#1d9e75" opacity="0.65">Temuco</text>
-            <text x="136" y="102" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="7" fill="#1d9e75" opacity="0.55">Pta. Arenas</text>
-            <line x1="152" y1="19" x2="151" y2="27" stroke="#5dcaa5" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
-            <line x1="151" y1="36" x2="151" y2="45" stroke="#5dcaa5" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
-            <line x1="151" y1="54" x2="150" y2="63" stroke="#5dcaa5" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
-            <line x1="150" y1="72" x2="150" y2="79" stroke="#5dcaa5" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
-            <line x1="150" y1="88" x2="151" y2="95" stroke="#5dcaa5" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
-            <rect x="166" y="48" width="70" height="22" rx="6" fill="rgba(29,158,117,0.12)" stroke="#9fe1cb" stroke-width="1"/>
-            <text x="201" y="63" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#085041" font-weight="700">TODO CHILE</text>
-            <line x1="164" y1="59" x2="155" y2="59" stroke="#1d9e75" stroke-width="1.2"/>
-            <polygon points="155,59 160,56 160,62" fill="#1d9e75"/>
-            <circle cx="268" cy="42" r="16" fill="#5dcaa5" opacity="0.85"/>
-            <circle cx="268" cy="33" r="9" fill="#1d9e75" opacity="0.9"/>
-            <path d="M252 70 Q268 58 284 70" fill="#1d9e75" opacity="0.7"/>
-            <text x="268" y="92" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#085041" font-weight="600">Paciente</text>
-            <line x1="252" y1="55" x2="210" y2="55" stroke="#9fe1cb" stroke-width="1.3" stroke-dasharray="4 3"/>
-            <polygon points="210,55 216,52 216,58" fill="#9fe1cb"/>
-            <text x="231" y="50" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#1d9e75" opacity="0.7">acceso</text>
-            <text x="231" y="61" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#1d9e75" opacity="0.7">local</text>
-          </svg>
-        </div>
-        <div class="node-body">
-          <div class="node-num">INICIO</div>
-          <div class="node-title">Paciente</div>
-          <div class="node-sub">Accede a un punto de atención en su localidad — desde Arica a Punta Arenas, sin desplazarse a un centro de mayor complejidad</div>
-          <div class="node-tags"><span class="tag teal">Acceso local</span><span class="tag teal">Todo Chile</span><span class="tag teal">Sin desplazamiento</span></div>
-        </div>
-        <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
-      </div>
-      <div class="node-detail">
-        <div class="detail-inner" style="border-color:#9fe1cb;">
-          El paciente accede a un punto de atención de baja complejidad en su propia localidad. El modelo está diseñado para operar en zonas rurales y urbanas a lo largo de todo Chile — desde Arica hasta Punta Arenas — eliminando la barrera geográfica como obstáculo para recibir atención especializada.
-        </div>
+<!-- ══════════════════════════════════════
+     VISTA TÉCNICO/A EN ENFERMERÍA
+══════════════════════════════════════ -->
+<div class="view active" id="view-tecnico">
+
+  <!-- PASO 0: inicio -->
+  <div id="tec-step-0">
+    <div class="section-label teal">Punto de Atención · Todo Chile</div>
+    <div class="patient-card">
+      <div class="patient-meta">CASO #2847 · 09:14 AM</div>
+      <div class="patient-name">María González</div>
+      <div class="patient-meta">48 años · F · Coyhaique, Aysén</div>
+      <div class="patient-badges">
+        <span class="badge white">Cardiología</span>
+        <span class="badge amber">Urgencia media</span>
       </div>
     </div>
 
-    <div class="connector"><svg width="24" height="38" viewBox="0 0 24 38"><line x1="12" y1="0" x2="12" y2="28" stroke="#5dcaa5" stroke-width="1.5"/><polyline points="6,22 12,30 18,22" fill="none" stroke="#5dcaa5" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+    <div class="steps">
+      <div class="step active"><div class="step-dot"></div><div class="step-text">Datos</div></div>
+      <div class="step"><div class="step-dot"></div><div class="step-text">Vitales</div></div>
+      <div class="step"><div class="step-dot"></div><div class="step-text">Registro</div></div>
+      <div class="step"><div class="step-dot"></div><div class="step-text">Enviar</div></div>
+    </div>
 
-    <!-- PASO 1 -->
-    <div class="node-wrap" data-delay="100">
-      <div class="node n-teal" onclick="toggle(this)">
-        <div class="node-illustration" style="background:linear-gradient(120deg,#e1f5ee 60%,#c5f0df 100%);">
-          <svg width="340" height="120" viewBox="0 0 340 120">
-            <rect x="70" y="76" width="200" height="10" rx="3" fill="#9fe1cb"/>
-            <rect x="82" y="56" width="176" height="22" rx="4" fill="#5dcaa5" opacity="0.25"/>
-            <circle cx="138" cy="40" r="14" fill="#1d9e75"/>
-            <path d="M120 74 Q138 60 156 74" fill="#1d9e75"/>
-            <rect x="131" y="32" width="14" height="3" rx="1" fill="white" opacity="0.9"/>
-            <rect x="136" y="27" width="4" height="13" rx="1" fill="white" opacity="0.9"/>
-            <path d="M146 50 Q154 60 151 68" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-            <circle cx="151" cy="69" r="3.5" fill="none" stroke="white" stroke-width="1.5"/>
-            <rect x="68" y="90" width="100" height="14" rx="4" fill="rgba(8,80,65,0.1)"/>
-            <text x="118" y="101" text-anchor="middle" font-family="Sora,sans-serif" font-size="8.5" fill="#085041" font-weight="700">Técnico/a Enfermería</text>
-            <circle cx="218" cy="44" r="12" fill="#5dcaa5"/>
-            <path d="M205 72 Q218 62 231 72" fill="#5dcaa5"/>
-            <text x="218" y="88" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#085041">Paciente</text>
-            <rect x="42" y="48" width="24" height="34" rx="4" fill="#085041" opacity="0.12"/>
-            <rect x="46" y="52" width="16" height="12" rx="2" fill="#1d9e75" opacity="0.45"/>
-            <rect x="48" y="68" width="12" height="2" rx="1" fill="#1d9e75" opacity="0.4"/>
-            <rect x="274" y="44" width="26" height="36" rx="4" fill="#085041" opacity="0.12"/>
-            <rect x="278" y="48" width="18" height="14" rx="2" fill="#1d9e75" opacity="0.45"/>
-            <circle cx="287" cy="72" r="4" fill="none" stroke="#1d9e75" stroke-width="1.2" opacity="0.55"/>
-            <rect x="172" y="8" width="70" height="18" rx="6" fill="rgba(29,158,117,0.1)" stroke="#9fe1cb" stroke-width="1"/>
-            <text x="207" y="21" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#085041" font-weight="700">Todo Chile</text>
-          </svg>
-        </div>
-        <div class="node-body">
-          <div class="node-num">PASO 01</div>
-          <div class="node-title">Punto de atención</div>
-          <div class="node-sub">Centro de baja complejidad con técnico/a en enfermería que recibe al paciente, registra signos vitales y realiza la evaluación inicial — disponible en todo Chile</div>
-          <div class="node-tags"><span class="tag teal">Técnico/a Enfermería</span><span class="tag teal">Presencial</span><span class="tag teal">Baja complejidad</span><span class="tag teal">Todo Chile</span></div>
-        </div>
-        <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
+    <div class="section-label teal">Datos del paciente</div>
+    <div class="card">
+      <div class="form-group">
+        <label class="form-label">Motivo de consulta</label>
+        <select class="form-select" id="motivo">
+          <option value="">Seleccionar...</option>
+          <option value="dolor-pecho" selected>Dolor en el pecho</option>
+          <option value="disnea">Dificultad para respirar</option>
+          <option value="palpitaciones">Palpitaciones</option>
+          <option value="cefalea">Cefalea intensa</option>
+        </select>
       </div>
-      <div class="node-detail">
-        <div class="detail-inner" style="border-color:#9fe1cb;">
-          Un/a técnico/a en enfermería recibe al paciente en el punto de atención local. Este rol es clave en el modelo — es quien guía el examen físico y garantiza la calidad del registro. Realiza:
-          <ul>
-            <li>Signos vitales: PA, FC, FR, temperatura, saturación O₂</li>
-            <li>Medidas antropométricas: peso, talla, IMC</li>
-            <li>Anamnesis dirigida según el motivo de consulta</li>
-            <li>Guía del examen físico frente a la cámara de video</li>
-            <li>Solicitud y procesamiento de exámenes básicos in situ (point-of-care)</li>
-          </ul>
-          Este modelo opera en puntos distribuidos a lo largo de todo Chile, desde zonas rurales hasta urbanas.
+      <div class="form-group">
+        <label class="form-label">Descripción breve</label>
+        <textarea class="form-textarea" id="descripcion" placeholder="Describe el síntoma principal...">Paciente refiere dolor opresivo en el pecho desde hace 2 horas, irradia a brazo izquierdo. Sudoración. Sin trauma previo.</textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Duración</label>
+          <select class="form-select">
+            <option selected>2 horas</option>
+            <option>30 min</option>
+            <option>Desde ayer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gravedad (1–10)</label>
+          <input type="number" class="form-input" value="7" min="1" max="10">
         </div>
       </div>
     </div>
-
-    <div class="connector"><svg width="24" height="38" viewBox="0 0 24 38"><line x1="12" y1="0" x2="12" y2="28" stroke="#5dcaa5" stroke-width="1.5"/><polyline points="6,22 12,30 18,22" fill="none" stroke="#5dcaa5" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
-
-    <!-- PASO 2 -->
-    <div class="node-wrap" data-delay="200">
-      <div class="node n-teal" onclick="toggle(this)">
-        <div class="node-illustration" style="background:linear-gradient(120deg,#e1f5ee 60%,#c5f0df 100%);">
-          <svg width="340" height="120" viewBox="0 0 340 120">
-            <rect x="110" y="12" width="120" height="90" rx="10" fill="white" stroke="#9fe1cb" stroke-width="1.5"/>
-            <rect x="116" y="18" width="108" height="70" rx="6" fill="#f7fdf9"/>
-            <rect x="116" y="18" width="108" height="18" rx="6" fill="#1d9e75"/>
-            <text x="170" y="31" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="white" font-weight="600">Cuestionario Clínico</text>
-            <rect x="122" y="42" width="60" height="5" rx="2" fill="#9fe1cb"/>
-            <rect x="122" y="50" width="90" height="3" rx="1.5" fill="#d3d1c7"/>
-            <rect x="122" y="55" width="75" height="3" rx="1.5" fill="#d3d1c7"/>
-            <rect x="122" y="63" width="8" height="8" rx="2" fill="none" stroke="#9fe1cb" stroke-width="1.2"/>
-            <rect x="122" y="74" width="8" height="8" rx="2" fill="#1d9e75"/>
-            <path d="M124 78 L126 80 L130 76" stroke="white" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-            <rect x="135" y="65" width="50" height="3" rx="1.5" fill="#d3d1c7"/>
-            <rect x="135" y="76" width="40" height="3" rx="1.5" fill="#5dcaa5"/>
-            <rect x="122" y="84" width="96" height="4" rx="2" fill="#e1f5ee"/>
-            <rect x="122" y="84" width="60" height="4" rx="2" fill="#1d9e75"/>
-            <rect x="248" y="25" width="68" height="18" rx="6" fill="#e1f5ee" stroke="#9fe1cb" stroke-width="1"/>
-            <text x="282" y="37" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#085041" font-weight="600">Cardiología</text>
-            <rect x="248" y="48" width="68" height="18" rx="6" fill="#e1f5ee" stroke="#9fe1cb" stroke-width="1" opacity="0.6"/>
-            <text x="282" y="60" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#085041">Neurología</text>
-            <rect x="248" y="71" width="68" height="18" rx="6" fill="#e1f5ee" stroke="#9fe1cb" stroke-width="1" opacity="0.4"/>
-            <text x="282" y="83" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#085041">Medicina Int.</text>
-            <line x1="230" y1="55" x2="246" y2="55" stroke="#9fe1cb" stroke-width="1.5"/>
-            <polygon points="246,55 241,52 241,58" fill="#9fe1cb"/>
-            <circle cx="316" cy="34" r="4" fill="#1d9e75" style="animation:pulse 1.5s ease-in-out infinite"/>
-          </svg>
-        </div>
-        <div class="node-body">
-          <div class="node-num">PASO 02</div>
-          <div class="node-title">Cuestionario clínico</div>
-          <div class="node-sub">Cuestionario estructurado según el motivo de consulta que orienta la derivación al especialista correcto</div>
-          <div class="node-tags"><span class="tag teal">Estructurado</span><span class="tag teal">Digital</span><span class="tag teal">Derivación dirigida</span></div>
-        </div>
-        <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
-      </div>
-      <div class="node-detail">
-        <div class="detail-inner" style="border-color:#9fe1cb;">
-          El paciente responde un cuestionario digital estructurado según su motivo de consulta. El sistema determina automáticamente a qué especialista derivar:
-          <ul>
-            <li>Síntomas, duración y evolución</li>
-            <li>Antecedentes mórbidos y medicamentos</li>
-            <li>Escala de gravedad percibida</li>
-            <li>Resultado: derivación automática a la especialidad más adecuada</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="connector"><svg width="24" height="38" viewBox="0 0 24 38"><line x1="12" y1="0" x2="12" y2="28" stroke="#5dcaa5" stroke-width="1.5"/><polyline points="6,22 12,30 18,22" fill="none" stroke="#5dcaa5" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
-
-    <!-- PASO 3 -->
-    <div class="node-wrap" data-delay="300">
-      <div class="node n-teal" onclick="toggle(this)">
-        <div class="node-illustration" style="background:linear-gradient(120deg,#e1f5ee 60%,#c5f0df 100%);">
-          <svg width="340" height="120" viewBox="0 0 340 120">
-            <rect x="28" y="30" width="52" height="38" rx="6" fill="#085041" opacity="0.85"/>
-            <polygon points="80,36 96,44 80,52" fill="#085041" opacity="0.7"/>
-            <circle cx="44" cy="49" r="10" fill="none" stroke="#5dcaa5" stroke-width="2"/>
-            <circle cx="44" cy="49" r="6" fill="#1d9e75" opacity="0.6"/>
-            <rect x="62" y="32" width="6" height="6" rx="2" fill="#ef4444" style="animation:blink 1.2s ease-in-out infinite"/>
-            <text x="54" y="80" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#085041">VIDEO HD</text>
-            <rect x="108" y="38" width="14" height="22" rx="7" fill="#085041" opacity="0.8"/>
-            <path d="M104 56 Q108 66 115 66 Q122 66 126 56" stroke="#1d9e75" stroke-width="1.5" fill="none"/>
-            <line x1="115" y1="66" x2="115" y2="74" stroke="#1d9e75" stroke-width="1.5"/>
-            <line x1="110" y1="74" x2="120" y2="74" stroke="#1d9e75" stroke-width="1.5"/>
-            <rect x="130" y="52" width="3" height="16" rx="1.5" fill="#1d9e75" opacity="0.7" style="animation:wave 0.8s ease-in-out infinite 0s; transform-origin:center"/>
-            <rect x="136" y="48" width="3" height="24" rx="1.5" fill="#1d9e75" opacity="0.8" style="animation:wave 0.8s ease-in-out infinite 0.15s; transform-origin:center"/>
-            <rect x="142" y="44" width="3" height="32" rx="1.5" fill="#1d9e75" style="animation:wave 0.8s ease-in-out infinite 0.3s; transform-origin:center"/>
-            <rect x="148" y="48" width="3" height="24" rx="1.5" fill="#1d9e75" opacity="0.8" style="animation:wave 0.8s ease-in-out infinite 0.45s; transform-origin:center"/>
-            <rect x="154" y="52" width="3" height="16" rx="1.5" fill="#1d9e75" opacity="0.6" style="animation:wave 0.8s ease-in-out infinite 0.6s; transform-origin:center"/>
-            <text x="120" y="90" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#085041">AUDIO</text>
-            <rect x="178" y="28" width="68" height="42" rx="6" fill="white" stroke="#9fe1cb" stroke-width="1.2"/>
-            <path d="M184 50 L192 50 L196 36 L200 62 L204 50 L208 50 L212 42 L216 50 L236 50" stroke="#1d9e75" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-            <text x="212" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#085041">ECG</text>
-            <rect x="256" y="22" width="36" height="52" rx="4" fill="#085041" opacity="0.12" stroke="#9fe1cb" stroke-width="1"/>
-            <ellipse cx="274" cy="42" rx="10" ry="12" fill="none" stroke="#1d9e75" stroke-width="1.2" opacity="0.6"/>
-            <line x1="270" y1="34" x2="278" y2="52" stroke="#1d9e75" stroke-width="1" opacity="0.5"/>
-            <line x1="278" y1="34" x2="270" y2="52" stroke="#1d9e75" stroke-width="1" opacity="0.5"/>
-            <text x="274" y="86" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#085041">RX</text>
-            <rect x="302" y="30" width="30" height="46" rx="4" fill="white" stroke="#9fe1cb" stroke-width="1"/>
-            <text x="317" y="44" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#1d9e75" font-weight="500">K⁺</text>
-            <text x="317" y="55" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#085041">4.2</text>
-            <text x="317" y="63" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#1d9e75" font-weight="500">Na⁺</text>
-            <text x="317" y="74" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#085041">138</text>
-            <text x="317" y="88" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#085041">LAB</text>
-          </svg>
-        </div>
-        <div class="node-body">
-          <div class="node-num">PASO 03</div>
-          <div class="node-title">Examen físico completo</div>
-          <div class="node-sub">Registro multimodal estructurado guiado por el/la técnico/a en enfermería: video HD continuo, audio, ECG, radiografía y laboratorio</div>
-          <div class="node-tags"><span class="tag teal">Video HD</span><span class="tag teal">Audio</span><span class="tag teal">ECG</span><span class="tag teal">Rx portátil</span><span class="tag teal">K⁺ · Na⁺ · Glicemia</span></div>
-        </div>
-        <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
-      </div>
-      <div class="node-detail">
-        <div class="detail-inner" style="border-color:#9fe1cb;">
-          El examen físico se registra con un protocolo multimodal guiado por el/la técnico/a en enfermería:
-          <ul>
-            <li><strong>Video HD continuo:</strong> inspección, auscultación, palpación filmada</li>
-            <li><strong>Audio de alta fidelidad:</strong> ruidos cardíacos, respiratorios y descripción verbal</li>
-            <li><strong>ECG de 12 derivaciones:</strong> equipo portátil, trazado en alta resolución</li>
-            <li><strong>Radiografía portátil:</strong> tórax y otras regiones según indicación clínica</li>
-            <li><strong>Laboratorio point-of-care:</strong> K⁺, Na⁺, Cl⁻, glicemia, hemograma, PCR</li>
-            <li><strong>Signos vitales:</strong> PA, FC, FR, SpO₂, temperatura, peso, talla</li>
-          </ul>
-          Todo queda registrado en alta calidad y asociado al expediente del paciente en la nube.
-        </div>
-      </div>
-    </div>
-
+    <button class="btn btn-primary" onclick="tecStep(1)">Continuar → Signos Vitales</button>
   </div>
 
-  <div class="phase-gap"><svg width="24" height="52" viewBox="0 0 24 52"><line x1="12" y1="0" x2="12" y2="38" stroke="#c8c6bc" stroke-width="1.5" stroke-dasharray="5 3"/><polyline points="6,32 12,42 18,32" fill="none" stroke="#c8c6bc" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+  <!-- PASO 1: vitales -->
+  <div id="tec-step-1" class="hidden">
+    <div class="section-label teal">Signos vitales</div>
 
-  <!-- FASE 2 -->
-  <div class="phase-block phase-purple">
-    <div class="phase-label purple"><span class="phase-dot purple"></span>Fase 2 — Evaluación Asincrónica</div>
+    <div class="steps">
+      <div class="step done"><div class="step-dot"></div><div class="step-text">Datos</div></div>
+      <div class="step active"><div class="step-dot"></div><div class="step-text">Vitales</div></div>
+      <div class="step"><div class="step-dot"></div><div class="step-text">Registro</div></div>
+      <div class="step"><div class="step-dot"></div><div class="step-text">Enviar</div></div>
+    </div>
 
-    <!-- PASO 4 NUBE -->
-    <div class="node-wrap" data-delay="400">
-      <div class="node n-purple" onclick="toggle(this)">
-        <div class="node-illustration" style="background:linear-gradient(120deg,#eeedfe 60%,#dddcfc 100%);">
-          <svg width="340" height="120" viewBox="0 0 340 120">
-            <ellipse cx="170" cy="55" rx="50" ry="32" fill="white" stroke="#afa9ec" stroke-width="1.5"/>
-            <ellipse cx="148" cy="48" rx="24" ry="18" fill="white" stroke="#afa9ec" stroke-width="1"/>
-            <ellipse cx="192" cy="46" rx="22" ry="16" fill="white" stroke="#afa9ec" stroke-width="1"/>
-            <text x="170" y="62" text-anchor="middle" font-size="22">☁</text>
-            <rect x="38" y="35" width="36" height="26" rx="4" fill="white" stroke="#afa9ec" stroke-width="1"/>
-            <path d="M44 35 L44 28 L52 28 L58 35" fill="#eeedfe" stroke="#afa9ec" stroke-width="1"/>
-            <rect x="44" y="44" width="24" height="2" rx="1" fill="#afa9ec"/>
-            <rect x="44" y="49" width="16" height="2" rx="1" fill="#afa9ec" opacity="0.6"/>
-            <text x="56" y="74" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#7f77dd">VIDEO</text>
-            <line x1="74" y1="48" x2="116" y2="52" stroke="#afa9ec" stroke-width="1" stroke-dasharray="3 2"/>
-            <polygon points="116,52 110,49 110,55" fill="#afa9ec"/>
-            <rect x="38" y="72" width="36" height="26" rx="4" fill="white" stroke="#afa9ec" stroke-width="1"/>
-            <path d="M44 72 L44 65 L52 65 L58 72" fill="#eeedfe" stroke="#afa9ec" stroke-width="1"/>
-            <rect x="44" y="81" width="24" height="2" rx="1" fill="#afa9ec"/>
-            <rect x="44" y="86" width="18" height="2" rx="1" fill="#afa9ec" opacity="0.6"/>
-            <text x="56" y="110" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#7f77dd">ECG/RX</text>
-            <line x1="74" y1="83" x2="118" y2="62" stroke="#afa9ec" stroke-width="1" stroke-dasharray="3 2"/>
-            <polygon points="118,62 113,57 112,64" fill="#afa9ec"/>
-            <rect x="268" y="35" width="36" height="26" rx="4" fill="white" stroke="#afa9ec" stroke-width="1"/>
-            <path d="M274 35 L274 28 L282 28 L288 35" fill="#eeedfe" stroke="#afa9ec" stroke-width="1"/>
-            <rect x="274" y="44" width="24" height="2" rx="1" fill="#7f77dd"/>
-            <rect x="274" y="49" width="16" height="2" rx="1" fill="#7f77dd" opacity="0.6"/>
-            <text x="286" y="74" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#7f77dd">LAB</text>
-            <line x1="230" y1="52" x2="266" y2="48" stroke="#afa9ec" stroke-width="1" stroke-dasharray="3 2"/>
-            <polygon points="266,48 260,45 260,51" fill="#afa9ec"/>
-            <rect x="268" y="72" width="36" height="26" rx="4" fill="white" stroke="#afa9ec" stroke-width="1"/>
-            <path d="M274 72 L274 65 L282 65 L288 72" fill="#eeedfe" stroke="#afa9ec" stroke-width="1"/>
-            <rect x="274" y="81" width="24" height="2" rx="1" fill="#7f77dd"/>
-            <rect x="274" y="86" width="18" height="2" rx="1" fill="#7f77dd" opacity="0.6"/>
-            <text x="286" y="110" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#7f77dd">CUEST.</text>
-            <line x1="228" y1="62" x2="266" y2="76" stroke="#afa9ec" stroke-width="1" stroke-dasharray="3 2"/>
-            <polygon points="266,76 260,71 261,78" fill="#afa9ec"/>
-            <!-- badge notificacion WA -->
-            <rect x="140" y="80" width="60" height="16" rx="6" fill="#25D366" opacity="0.15" stroke="#25D366" stroke-width="1"/>
-            <text x="170" y="92" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7.5" fill="#075E54" font-weight="700">→ WhatsApp</text>
-          </svg>
-        </div>
-        <div class="node-body">
-          <div class="node-num">PASO 04</div>
-          <div class="node-title">Expediente en la nube</div>
-          <div class="node-sub">Toda la información consolidada y lista — el sistema notifica automáticamente al especialista vía WhatsApp</div>
-          <div class="node-tags"><span class="tag purple">Video · Audio</span><span class="tag purple">ECG · Rx</span><span class="tag purple">Laboratorio</span><span class="tag purple">→ Notifica WA</span></div>
-        </div>
-        <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
+    <div class="vitals-grid">
+      <div class="vital-box" style="border-color:#fca5a5;">
+        <span class="vital-val" style="color:#dc2626;">148/94</span>
+        <span class="vital-unit">mmHg</span>
+        <span class="vital-label">PA</span>
       </div>
-      <div class="node-detail">
-        <div class="detail-inner" style="border-color:var(--purple-200);">
-          Todos los registros quedan consolidados en un expediente digital seguro en la nube. En cuanto está completo, el sistema envía automáticamente una notificación al especialista:
-          <ul>
-            <li>Video HD continuo del examen físico y audio de alta fidelidad</li>
-            <li>Trazado ECG de 12 derivaciones en alta resolución</li>
-            <li>Imágenes radiológicas digitales</li>
-            <li>Resultados de laboratorio point-of-care</li>
-            <li>Cuestionario clínico y signos vitales</li>
-            <li><strong>Notificación automática vía WhatsApp</strong> al especialista correspondiente</li>
-          </ul>
+      <div class="vital-box">
+        <span class="vital-val">98</span>
+        <span class="vital-unit">lpm</span>
+        <span class="vital-label">FC</span>
+      </div>
+      <div class="vital-box">
+        <span class="vital-val">96%</span>
+        <span class="vital-unit">SpO₂</span>
+        <span class="vital-label">Saturación</span>
+      </div>
+      <div class="vital-box">
+        <span class="vital-val">18</span>
+        <span class="vital-unit">rpm</span>
+        <span class="vital-label">FR</span>
+      </div>
+      <div class="vital-box">
+        <span class="vital-val">37.1</span>
+        <span class="vital-unit">°C</span>
+        <span class="vital-label">Temp.</span>
+      </div>
+      <div class="vital-box">
+        <span class="vital-val">72</span>
+        <span class="vital-unit">kg</span>
+        <span class="vital-label">Peso</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Laboratorio point-of-care</div>
+      <div class="lab-grid">
+        <div class="lab-item abnormal">
+          <div class="lab-name">Troponina</div>
+          <div class="lab-value">0.08</div>
+          <div class="lab-range">Ref: &lt;0.04 ng/mL</div>
+        </div>
+        <div class="lab-item">
+          <div class="lab-name">Glicemia</div>
+          <div class="lab-value">112</div>
+          <div class="lab-range">Ref: 70–100 mg/dL</div>
+        </div>
+        <div class="lab-item">
+          <div class="lab-name">K⁺</div>
+          <div class="lab-value">4.1</div>
+          <div class="lab-range">Ref: 3.5–5.0 mEq/L</div>
+        </div>
+        <div class="lab-item">
+          <div class="lab-name">Na⁺</div>
+          <div class="lab-value">138</div>
+          <div class="lab-range">Ref: 135–145 mEq/L</div>
         </div>
       </div>
     </div>
 
-    <div class="connector"><svg width="24" height="38" viewBox="0 0 24 38"><line x1="12" y1="0" x2="12" y2="28" stroke="#ba7517" stroke-width="1.5" stroke-dasharray="4 3"/><polyline points="6,22 12,30 18,22" fill="none" stroke="#ba7517" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+    <div class="ecg-strip">
+      <div class="ecg-label">ECG · 12 derivaciones · 25mm/s</div>
+      <svg class="ecg-line" height="50" viewBox="0 0 500 50" preserveAspectRatio="none">
+        <polyline points="0,25 20,25 25,10 30,40 35,5 40,35 45,25 80,25 105,25 110,10 115,40 120,5 125,35 130,25 165,25 190,25 195,10 200,40 205,5 210,35 215,25 250,25 275,25 280,10 285,40 290,5 295,35 300,25 335,25 360,25 365,10 370,40 375,5 380,35 385,25 420,25 445,25 450,10 455,40 460,5 465,35 470,25 500,25"
+          fill="none" stroke="#4ade80" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <button class="btn btn-primary" onclick="tecStep(2)">Continuar → Video / Examen Físico</button>
+    <button class="btn btn-secondary" onclick="tecStep(0)">← Atrás</button>
+  </div>
 
-    <!-- EVALUACION ASINCRONICA (nodo único fusionado) -->
-    <div class="node-wrap" data-delay="500">
-      <div class="node critical" onclick="toggle(this)">
-        <div class="node-illustration" style="background:var(--amber-50);">
-          <svg width="340" height="120" viewBox="0 0 340 120">
-            <!-- teléfono con WA + video -->
-            <rect x="18" y="10" width="48" height="100" rx="8" fill="#1a1a18" opacity="0.88"/>
-            <rect x="23" y="17" width="38" height="60" rx="4" fill="#075E54"/>
-            <!-- burbuja WA -->
-            <rect x="25" y="20" width="34" height="24" rx="5" fill="#25D366"/>
-            <text x="42" y="30" text-anchor="middle" font-family="Sora,sans-serif" font-size="6" fill="white" font-weight="700">TeleSalud</text>
-            <text x="42" y="39" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="5.5" fill="rgba(255,255,255,0.85)">Nueva evaluación</text>
-            <!-- badge -->
-            <circle cx="61" cy="17" r="6" fill="#25D366"/>
-            <text x="61" y="21" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="white" font-weight="700">1</text>
-            <!-- video debajo -->
-            <rect x="23" y="48" width="38" height="26" rx="3" fill="#1a0a1a"/>
-            <circle cx="42" cy="58" r="8" fill="#7f77dd" opacity="0.6"/>
-            <!-- barra progreso -->
-            <rect x="23" y="76" width="38" height="3" rx="1.5" fill="#333"/>
-            <rect x="23" y="76" width="24" height="3" rx="1.5" fill="#ba7517"/>
-            <!-- play -->
-            <circle cx="42" cy="88" r="6" fill="#ba7517" opacity="0.8"/>
-            <polygon points="40,85 40,91 46,88" fill="white"/>
-            <!-- flecha de notificacion -->
-            <line x1="68" y1="35" x2="90" y2="35" stroke="#25D366" stroke-width="1.5" stroke-dasharray="3 2"/>
-            <polygon points="90,35 85,32 85,38" fill="#25D366"/>
-            <!-- médico especialista -->
-            <circle cx="115" cy="35" r="16" fill="#ba7517" opacity="0.85"/>
-            <path d="M94 68 Q115 54 136 68" fill="#ba7517" opacity="0.7"/>
-            <text x="115" y="41" text-anchor="middle" font-size="14" fill="white">⚕</text>
-            <text x="115" y="82" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#854f0b" font-weight="600">Especialista</text>
-            <!-- flecha médico mira video -->
-            <line x1="68" y1="58" x2="94" y2="55" stroke="#ba7517" stroke-width="1.5"/>
-            <polygon points="94,55 88,52 88,58" fill="#ba7517"/>
-            <!-- línea de tiempo asincrónica -->
-            <line x1="150" y1="60" x2="322" y2="60" stroke="#ef9f27" stroke-width="1.5" opacity="0.4"/>
-            <circle cx="165" cy="60" r="6" fill="#ba7517"/>
-            <text x="165" y="46" text-anchor="middle" font-family="Sora,sans-serif" font-size="8" fill="#854f0b" font-weight="600">Recibe WA</text>
-            <circle cx="240" cy="60" r="6" fill="#ef9f27" style="animation:pulse 2s ease-in-out infinite"/>
-            <text x="240" y="46" text-anchor="middle" font-family="Sora,sans-serif" font-size="8" fill="#854f0b" font-weight="600">Revisa video</text>
-            <circle cx="315" cy="60" r="6" fill="#faeeda" stroke="#ba7517" stroke-width="1.5"/>
-            <text x="315" y="46" text-anchor="middle" font-family="Sora,sans-serif" font-size="8" fill="#854f0b" font-weight="600">Llama</text>
-            <!-- reloj "cuando puede" -->
-            <circle cx="315" cy="85" r="12" fill="none" stroke="#ef9f27" stroke-width="1.5" opacity="0.6"/>
-            <line x1="315" y1="79" x2="315" y2="85" stroke="#ba7517" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="315" y1="85" x2="320" y2="85" stroke="#ba7517" stroke-width="1.5" stroke-linecap="round"/>
-            <rect x="150" y="70" width="90" height="18" rx="5" fill="#ba7517" opacity="0.1"/>
-            <text x="195" y="83" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#854f0b" font-weight="700">Sin barrera horaria</text>
-          </svg>
+  <!-- PASO 2: grabación -->
+  <div id="tec-step-2" class="hidden">
+    <div class="section-label teal">Examen físico — Video HD</div>
+
+    <div class="steps">
+      <div class="step done"><div class="step-dot"></div><div class="step-text">Datos</div></div>
+      <div class="step done"><div class="step-dot"></div><div class="step-text">Vitales</div></div>
+      <div class="step active"><div class="step-dot"></div><div class="step-text">Registro</div></div>
+      <div class="step"><div class="step-dot"></div><div class="step-text">Enviar</div></div>
+    </div>
+
+    <div class="recording-area" id="recArea">
+      <div class="rec-label"><span class="rec-dot"></span>GRABANDO · VIDEO HD CONTINUO</div>
+      <span class="rec-timer" id="recTimer">00:00</span>
+      <div class="waveform">
+        <div class="wave-bar" style="height:12px;animation-delay:0s"></div>
+        <div class="wave-bar" style="height:20px;animation-delay:0.1s"></div>
+        <div class="wave-bar" style="height:28px;animation-delay:0.2s"></div>
+        <div class="wave-bar" style="height:18px;animation-delay:0.3s"></div>
+        <div class="wave-bar" style="height:24px;animation-delay:0.4s"></div>
+        <div class="wave-bar" style="height:16px;animation-delay:0.5s"></div>
+        <div class="wave-bar" style="height:22px;animation-delay:0.6s"></div>
+        <div class="wave-bar" style="height:28px;animation-delay:0.7s"></div>
+        <div class="wave-bar" style="height:14px;animation-delay:0.8s"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Protocolo de examen guiado</div>
+      <ul class="checklist" id="examChecklist">
+        <li><span class="check-icon pending" id="chk0"></span>Inspección general y coloración</li>
+        <li><span class="check-icon pending" id="chk1"></span>Auscultación cardíaca</li>
+        <li><span class="check-icon pending" id="chk2"></span>Auscultación pulmonar</li>
+        <li><span class="check-icon pending" id="chk3"></span>Palpación abdominal</li>
+        <li><span class="check-icon pending" id="chk4"></span>Descripción verbal del paciente</li>
+      </ul>
+    </div>
+
+    <div id="stopRecBtn">
+      <button class="btn btn-amber" onclick="stopRecording()" id="stopBtn" disabled>⏹ Detener grabación y continuar</button>
+      <p class="text-sm" style="text-align:center;margin-top:4px;">El botón se habilita al completar el protocolo</p>
+    </div>
+    <button class="btn btn-secondary" onclick="tecStep(1)">← Atrás</button>
+  </div>
+
+  <!-- PASO 3: enviar -->
+  <div id="tec-step-3" class="hidden">
+    <div class="section-label teal">Resumen del expediente</div>
+
+    <div class="steps">
+      <div class="step done"><div class="step-dot"></div><div class="step-text">Datos</div></div>
+      <div class="step done"><div class="step-dot"></div><div class="step-text">Vitales</div></div>
+      <div class="step done"><div class="step-dot"></div><div class="step-text">Registro</div></div>
+      <div class="step active"><div class="step-dot"></div><div class="step-text">Enviar</div></div>
+    </div>
+
+    <div class="patient-card">
+      <div class="patient-meta">EXPEDIENTE CONSOLIDADO · CASO #2847</div>
+      <div class="patient-name">María González</div>
+      <div class="patient-meta">48 años · Coyhaique · Dolor en el pecho</div>
+      <div class="patient-badges">
+        <span class="badge white">☁ Nube</span>
+        <span class="badge white">🎥 Video 4:18</span>
+        <span class="badge white">♥ ECG</span>
+        <span class="badge amber">Troponina ↑</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="check-icon done">✓</span>Datos y cuestionario clínico</li>
+        <li><span class="check-icon done">✓</span>Signos vitales (PA 148/94 ↑)</li>
+        <li><span class="check-icon done">✓</span>Laboratorio (Troponina elevada)</li>
+        <li><span class="check-icon done">✓</span>ECG de 12 derivaciones</li>
+        <li><span class="check-icon done">✓</span>Video HD continuo (4:18 min)</li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-color:#dcf8c6; background:#f0fdf4;">
+      <div class="flex-between">
+        <div>
+          <div class="card-title" style="color:#075E54;">Notificación WhatsApp</div>
+          <div class="card-sub">Se enviará al cardiólogo de turno con enlace al expediente y teléfono de la paciente</div>
         </div>
-        <div class="node-body">
-          <div class="critical-badge">⚑ Punto crítico del modelo</div>
-          <div class="node-title" style="color:var(--amber-600)">Evaluación asincrónica</div>
-          <div class="node-sub" style="color:var(--amber-400)">El especialista recibe un WhatsApp, revisa el video del examen desde su celular y llama al paciente — cuando puede, desde cualquier lugar</div>
-          <div class="node-tags">
-            <span class="tag amber">WhatsApp</span>
-            <span class="tag amber">Video desde el celular</span>
-            <span class="tag amber">Sin barrera horaria</span>
-            <span class="tag amber">Escalable</span>
+        <span style="font-size:28px;">📲</span>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="sendBtn" onclick="enviarExpediente()">
+      Consolidar y notificar al médico →
+    </button>
+    <button class="btn btn-secondary" onclick="tecStep(2)">← Atrás</button>
+  </div>
+
+  <!-- PASO 4: confirmación -->
+  <div id="tec-step-4" class="hidden animate-in">
+    <div style="text-align:center; padding: 2rem 0 1rem;">
+      <div style="font-size:56px; margin-bottom:12px;">✅</div>
+      <div style="font-size:20px; font-weight:700; margin-bottom:6px;">Expediente enviado</div>
+      <div class="text-sm">El cardiólogo ha sido notificado vía WhatsApp</div>
+    </div>
+
+    <div class="card" style="border-color:#dcf8c6; background:#f0fdf4;">
+      <div class="card-title" style="color:#075E54;">WhatsApp enviado a Dr. Andrés Rojas</div>
+      <div class="card-sub mt-1">
+        <strong>TeleSalud Remota</strong><br>
+        Nueva evaluación disponible — Cardiología<br>
+        Paciente: María González, 48 años<br>
+        Motivo: Dolor en el pecho · Troponina ↑ · PA 148/94<br>
+        📎 Ver expediente completo → bit.ly/ts2847<br>
+        📞 Paciente: +56 9 8821 4403
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex-between">
+        <div class="card-title">Estado del caso</div>
+        <span class="status-pill waiting">⏳ En revisión</span>
+      </div>
+      <div class="card-sub mt-1">El médico revisará el expediente y llamará a la paciente. El técnico puede continuar con la siguiente atención.</div>
+    </div>
+
+    <button class="btn btn-secondary" onclick="resetTecnico()">Nueva atención</button>
+    <p class="text-sm" style="text-align:center; margin-top:8px;">Ahora cambia a la vista <strong>Médico</strong> para ver cómo recibe el caso →</p>
+  </div>
+
+</div><!-- /view-tecnico -->
+
+
+<!-- ══════════════════════════════════════
+     VISTA MÉDICO ESPECIALISTA
+══════════════════════════════════════ -->
+<div class="view" id="view-medico">
+
+  <!-- ESTADO: sin notificación aún -->
+  <div id="med-waiting" id="med-waiting">
+    <div style="text-align:center; padding: 3rem 1rem;">
+      <div style="font-size:48px; margin-bottom:12px; opacity:0.4;">📵</div>
+      <div style="font-size:16px; font-weight:700; color:var(--gray2); margin-bottom:6px;">Sin notificaciones</div>
+      <div class="text-sm">Completa el flujo del técnico primero para generar un caso</div>
+    </div>
+  </div>
+
+  <!-- ESTADO: notificación recibida -->
+  <div id="med-notif" class="hidden">
+    <div class="section-label purple">Vista del Médico · Dr. Andrés Rojas</div>
+
+    <!-- phone frame -->
+    <div class="phone-frame">
+      <div class="phone-screen">
+
+        <!-- pantalla: WA notificación -->
+        <div class="phone-screen-inner active" id="med-screen-wa">
+          <div class="wa-topbar">
+            <div class="wa-avatar">TS</div>
+            <div>
+              <div class="wa-name">TeleSalud Remota</div>
+              <div class="wa-status">en línea</div>
+            </div>
+          </div>
+          <div class="wa-messages" style="flex:1;">
+            <div class="wa-msg recv animate-in">
+              <div class="wa-msg-title">🔔 Nueva evaluación · Cardiología</div>
+              <strong>Paciente:</strong> María González, 48 años<br>
+              <strong>Motivo:</strong> Dolor en el pecho<br>
+              <strong>Urgencia:</strong> Media<br>
+              <strong>Alertas:</strong> Troponina ↑ · PA 148/94<br><br>
+              📎 <span style="color:#0d8cf5; text-decoration:underline;">Ver expediente completo</span><br>
+              📞 Paciente: +56 9 8821 4403
+              <div class="wa-msg-time">09:16 ✓✓</div>
+            </div>
+          </div>
+          <div style="padding:12px; background:#e5ddd5;">
+            <button class="btn btn-purple" style="margin-bottom:0;" onclick="medScreen('video')">Ver expediente y video →</button>
           </div>
         </div>
-        <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
-      </div>
-      <div class="node-detail">
-        <div class="detail-inner" style="border-color:var(--amber-400);">
-          La asincronía es la clave estructural del modelo. El flujo completo desde la perspectiva del médico:
-          <ul>
-            <li><strong>Recibe WhatsApp:</strong> notificación automática con resumen del caso, nivel de urgencia y enlace al expediente</li>
-            <li><strong>Revisa el video:</strong> accede al video continuo HD del examen físico desde su celular, junto con ECG, radiografías, laboratorio y cuestionario</li>
-            <li><strong>Llama al paciente:</strong> con el expediente ya revisado, llama directamente al número del paciente para entregar su evaluación</li>
-          </ul>
-          Todo esto sin restricción horaria ni geográfica — un especialista en Santiago puede evaluar un paciente en Chiloé o Atacama en su horario disponible.
+
+        <!-- pantalla: video -->
+        <div class="phone-screen-inner" id="med-screen-video" style="background:#111; flex-direction:column;">
+          <div style="background:#1a1a18; padding:10px 14px; display:flex; align-items:center; gap:8px;">
+            <span style="color:rgba(255,255,255,0.6); cursor:pointer;" onclick="medScreen('wa')">← </span>
+            <span style="color:white; font-size:13px; font-weight:600;">Expediente #2847</span>
+          </div>
+
+          <div style="flex:1; overflow-y:auto; padding:10px;">
+            <!-- video -->
+            <div class="video-player">
+              <div class="video-screen">
+                <div class="video-person">👩</div>
+                <div class="video-overlay">
+                  <div class="video-rec"><span class="rec-dot"></span>HD</div>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:white;">4:18</div>
+                </div>
+              </div>
+              <div class="video-controls">
+                <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+                <div class="video-progress-bg">
+                  <div class="video-progress" id="vidProgress" style="width:0%"></div>
+                </div>
+                <span class="video-time" id="vidTime">0:00 / 4:18</span>
+              </div>
+            </div>
+
+            <!-- vitales rápidos -->
+            <div style="background:#1a1a1a; border-radius:10px; padding:10px; margin-bottom:10px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#888; margin-bottom:6px; letter-spacing:1px;">SIGNOS VITALES</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;">
+                <div style="text-align:center;">
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; color:#f87171;">148/94</div>
+                  <div style="font-size:9px; color:#888;">PA mmHg</div>
+                </div>
+                <div style="text-align:center;">
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; color:white;">98</div>
+                  <div style="font-size:9px; color:#888;">FC lpm</div>
+                </div>
+                <div style="text-align:center;">
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; color:#fbbf24;">96%</div>
+                  <div style="font-size:9px; color:#888;">SpO₂</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ECG -->
+            <div class="ecg-strip" style="margin-bottom:10px;">
+              <div class="ecg-label">ECG · 12 derivaciones</div>
+              <svg class="ecg-line" height="40" viewBox="0 0 500 40" preserveAspectRatio="none">
+                <polyline points="0,20 20,20 25,8 30,32 35,4 40,28 45,20 80,20 105,20 110,8 115,32 120,4 125,28 130,20 165,20 190,20 195,8 200,32 205,4 210,28 215,20 250,20 275,20 280,8 285,32 290,4 295,28 300,20 335,20 360,20 365,8 370,32 375,4 380,28 385,20 420,20 445,20 450,8 455,32 460,4 465,28 470,20 500,20"
+                  fill="none" stroke="#4ade80" stroke-width="1.5"/>
+              </svg>
+            </div>
+
+            <!-- lab -->
+            <div style="background:#1a1a1a; border-radius:10px; padding:10px; margin-bottom:10px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#888; margin-bottom:6px; letter-spacing:1px;">LABORATORIO</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                <div style="background:#2a0000; border-radius:6px; padding:8px;">
+                  <div style="font-size:9px; color:#f87171; font-family:'JetBrains Mono',monospace;">Troponina ↑</div>
+                  <div style="font-size:16px; font-weight:700; color:#f87171; font-family:'JetBrains Mono',monospace;">0.08</div>
+                  <div style="font-size:9px; color:#888;">ng/mL (ref &lt;0.04)</div>
+                </div>
+                <div style="background:#1a1a1a; border-radius:6px; padding:8px; border:1px solid #333;">
+                  <div style="font-size:9px; color:#888; font-family:'JetBrains Mono',monospace;">K⁺</div>
+                  <div style="font-size:16px; font-weight:700; color:white; font-family:'JetBrains Mono',monospace;">4.1</div>
+                  <div style="font-size:9px; color:#888;">mEq/L (normal)</div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-call" onclick="medScreen('llamada')">📞 Llamar a paciente</button>
+          </div>
         </div>
-      </div>
+
+        <!-- pantalla: llamada activa -->
+        <div class="phone-screen-inner" id="med-screen-llamada" style="background:#1a1a18; justify-content:space-between;">
+          <div style="padding:20px; text-align:center; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;">
+            <div style="font-size:11px; font-family:'JetBrains Mono',monospace; color:rgba(255,255,255,0.4); letter-spacing:2px;">LLAMADA ACTIVA</div>
+            <div style="width:72px;height:72px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 0 0 12px rgba(29,158,117,0.15), 0 0 0 24px rgba(29,158,117,0.07);">👩</div>
+            <div style="color:white; font-size:20px; font-weight:700;">María González</div>
+            <div style="color:rgba(255,255,255,0.5); font-size:13px; font-family:'JetBrains Mono',monospace;" id="callTimer">00:00</div>
+
+            <div style="background:#222; border-radius:12px; padding:12px 16px; width:100%; text-align:left; margin-top:8px;">
+              <div style="font-size:11px; font-family:'JetBrains Mono',monospace; color:rgba(255,255,255,0.4); margin-bottom:6px;">DIAGNÓSTICO A COMUNICAR</div>
+              <div style="font-size:13px; color:white; line-height:1.6;">
+                Síndrome coronario agudo probable. Troponina elevada (0.08). PA 148/94. Se indica:<br>
+                <span style="color:var(--teal-m);">• AAS 250mg SL inmediato</span><br>
+                <span style="color:var(--teal-m);">• Derivación urgente a Hospital Base</span><br>
+                <span style="color:var(--teal-m);">• No ingerir alimentos</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:20px; display:flex; gap:16px; justify-content:center;">
+            <div style="text-align:center;">
+              <button style="width:56px;height:56px;border-radius:50%;background:#333;border:none;font-size:22px;cursor:pointer;">🔇</button>
+              <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px;">Silencio</div>
+            </div>
+            <div style="text-align:center;">
+              <button onclick="colgarLlamada()" style="width:64px;height:64px;border-radius:50%;background:#ef4444;border:none;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(239,68,68,0.4);">📵</button>
+              <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px;">Colgar</div>
+            </div>
+            <div style="text-align:center;">
+              <button style="width:56px;height:56px;border-radius:50%;background:#333;border:none;font-size:22px;cursor:pointer;">🔊</button>
+              <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px;">Altavoz</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- pantalla: post-llamada -->
+        <div class="phone-screen-inner" id="med-screen-done" style="background:#1a1a18;">
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center; gap:12px;">
+            <div style="font-size:48px;">✅</div>
+            <div style="color:white; font-size:18px; font-weight:700;">Consulta completada</div>
+            <div style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.6;">
+              Diagnóstico y plan de tratamiento entregados directamente a la paciente
+            </div>
+            <div style="background:#1e3a2e; border-radius:12px; padding:14px; width:100%; text-align:left; margin-top:8px;">
+              <div style="font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--teal-m); margin-bottom:6px; letter-spacing:1px;">RESUMEN</div>
+              <div style="font-size:12px; color:rgba(255,255,255,0.8); line-height:1.7;">
+                Paciente: María González<br>
+                Dx: Síndrome coronario agudo<br>
+                Plan: Derivación urgente<br>
+                Duración llamada: 08:42
+              </div>
+            </div>
+            <button onclick="medScreen('wa')" style="background:var(--purple);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:pointer;width:100%;margin-top:8px;">Ver siguiente caso</button>
+          </div>
+        </div>
+
+      </div><!-- /phone-screen -->
+    </div><!-- /phone-frame -->
+
+    <div class="card mt-2">
+      <div class="card-title">Flujo del médico</div>
+      <ul class="checklist" id="medChecklist">
+        <li><span class="check-icon done">✓</span>Notificación WhatsApp recibida</li>
+        <li id="med-chk-video"><span class="check-icon pending" id="med-chk-v"></span>Revisión del expediente y video</li>
+        <li id="med-chk-call"><span class="check-icon pending" id="med-chk-c"></span>Llamada directa al paciente</li>
+        <li id="med-chk-done"><span class="check-icon pending" id="med-chk-d"></span>Retroalimentación entregada</li>
+      </ul>
     </div>
 
-  </div>
+  </div><!-- /med-notif -->
 
-
-  <!-- FASE 3 -->
-  <div class="phase-block phase-coral">
-    <div class="phase-label coral"><span class="phase-dot coral"></span>Fase 3 — Retroalimentación al Paciente</div>
-
-    <!-- LLAMADA DIRECTA -->
-    <div class="node-wrap" data-delay="800">
-      <div class="node n-coral" onclick="toggle(this)">
-        <div class="node-illustration" style="background:linear-gradient(120deg,#faece7 60%,#f5d8ce 100%);">
-          <svg width="340" height="120" viewBox="0 0 340 120">
-            <circle cx="75" cy="35" r="18" fill="#d85a30" opacity="0.85"/>
-            <path d="M50 72 Q75 56 100 72" fill="#d85a30" opacity="0.7"/>
-            <text x="75" y="41" text-anchor="middle" font-size="16" fill="white">⚕</text>
-            <text x="75" y="86" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#712b13" font-weight="600">Especialista</text>
-            <rect x="56" y="88" width="36" height="26" rx="6" fill="#1a1a18" opacity="0.8"/>
-            <rect x="60" y="92" width="28" height="18" rx="3" fill="#25D366" opacity="0.7"/>
-            <text x="74" y="104" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="white">📞</text>
-            <path d="M118 42 Q128 32 118 22" stroke="#25D366" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.4"/>
-            <path d="M124 48 Q140 32 124 16" stroke="#25D366" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
-            <path d="M130 54 Q152 32 130 10" stroke="#25D366" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.4" style="animation:pulse 2s ease-in-out infinite"/>
-            <line x1="110" y1="55" x2="230" y2="55" stroke="#25D366" stroke-width="2" stroke-dasharray="6 4" style="animation:pulse 1.5s ease-in-out infinite"/>
-            <rect x="148" y="42" width="44" height="26" rx="8" fill="#25D366" opacity="0.15" stroke="#25D366" stroke-width="1"/>
-            <text x="170" y="52" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#075E54" font-weight="700">llamada</text>
-            <text x="170" y="62" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="#075E54">activa</text>
-            <path d="M222 42 Q212 32 222 22" stroke="#25D366" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.4"/>
-            <path d="M216 48 Q200 32 216 16" stroke="#25D366" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
-            <circle cx="265" cy="35" r="18" fill="#5dcaa5" opacity="0.85"/>
-            <path d="M240 72 Q265 56 290 72" fill="#5dcaa5" opacity="0.7"/>
-            <text x="265" y="41" text-anchor="middle" font-size="16">🧑</text>
-            <text x="265" y="86" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#085041" font-weight="600">Paciente</text>
-            <rect x="246" y="88" width="36" height="26" rx="6" fill="#1a1a18" opacity="0.8"/>
-            <rect x="250" y="92" width="28" height="18" rx="3" fill="#1d9e75" opacity="0.7"/>
-            <text x="264" y="104" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="white">📱</text>
-            <rect x="186" y="72" width="140" height="42" rx="8" fill="white" stroke="#f0997b" stroke-width="1.2"/>
-            <text x="256" y="85" text-anchor="middle" font-family="Sora,sans-serif" font-size="8.5" fill="#712b13" font-weight="700">Retroalimentación directa</text>
-            <text x="256" y="96" text-anchor="middle" font-family="Sora,sans-serif" font-size="8" fill="#444">Diagnóstico · Tratamiento</text>
-            <text x="256" y="107" text-anchor="middle" font-family="Sora,sans-serif" font-size="8" fill="#444">Indicaciones · Derivación</text>
-          </svg>
-        </div>
-        <div class="node-body">
-          <div class="node-num">RESULTADO</div>
-          <div class="node-title">Llamada directa médico → paciente</div>
-          <div class="node-sub">Con el expediente revisado, el especialista llama directamente al paciente para entregar retroalimentación personalizada, diagnóstico y plan de tratamiento</div>
-          <div class="node-tags"><span class="tag coral">Llamada telefónica</span><span class="tag coral">Retroalimentación directa</span><span class="tag coral">Diagnóstico</span><span class="tag coral">Derivación si requiere</span></div>
-        </div>
-        <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l5 5 5-5"/></svg>
-      </div>
-      <div class="node-detail">
-        <div class="detail-inner" style="border-color:var(--coral-200);">
-          Una vez revisado el expediente, el médico llama directamente al paciente — sin intermediarios ni plataformas de videollamada. En esta llamada el especialista:
-          <ul>
-            <li>Explica los hallazgos clínicos al paciente en lenguaje comprensible</li>
-            <li>Entrega el diagnóstico y el plan de tratamiento detallado</li>
-            <li>Resuelve dudas y consultas del paciente en tiempo real</li>
-            <li>Indica si se requiere derivación presencial a un centro de mayor complejidad</li>
-            <li>Coordina seguimiento o controles posteriores si es necesario</li>
-          </ul>
-          Este modelo garantiza atención personalizada, directa y humana — sin que el paciente se desplace de su localidad.
-        </div>
-      </div>
-    </div>
-
-    <div class="return-banner" id="returnBanner">
-      <div class="return-label">↩ Retorno directo al paciente</div>
-      <div class="return-text">Diagnóstico · Tratamiento · Llamada personalizada — sin desplazamiento</div>
-    </div>
-
-  </div>
-
-</div>
-
+</div><!-- /view-medico -->
 
 <script>
-function toggle(node) {
-  const detail = node.nextElementSibling;
-  const isOpen = node.classList.contains('open');
-  document.querySelectorAll('.node.open').forEach(n => {
-    n.classList.remove('open');
-    n.nextElementSibling.classList.remove('open');
-  });
-  if (!isOpen) {
-    node.classList.add('open');
-    detail.classList.add('open');
+// ── STATE ──
+let expedienteEnviado = false;
+let recInterval = null;
+let recSeconds = 0;
+let examDone = 0;
+let playInterval = null;
+let playSeconds = 0;
+let callInterval = null;
+let callSeconds = 0;
+
+// ── ROLE SWITCH ──
+function switchRole(role) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.role-btn.' + role).classList.add('active');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + role).classList.add('active');
+
+  if (role === 'medico') {
+    if (expedienteEnviado) {
+      document.getElementById('med-waiting').classList.add('hidden');
+      document.getElementById('med-notif').classList.remove('hidden');
+    }
   }
 }
 
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const delay = entry.target.dataset.delay || 0;
-      setTimeout(() => {
-        const node = entry.target.querySelector('.node');
-        if (node) node.classList.add('visible');
-      }, parseInt(delay));
-      observer.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.1 });
+// ── TECNICO STEPS ──
+function tecStep(n) {
+  for (let i = 0; i <= 4; i++) {
+    const el = document.getElementById('tec-step-' + i);
+    if (el) el.classList.add('hidden');
+  }
+  const target = document.getElementById('tec-step-' + n);
+  if (target) { target.classList.remove('hidden'); target.classList.add('animate-in'); }
 
-document.querySelectorAll('.node-wrap').forEach(w => observer.observe(w));
+  if (n === 2) startRecording();
+}
 
-const bannerObserver = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      setTimeout(() => e.target.classList.add('visible'), 400);
-      bannerObserver.unobserve(e.target);
+// ── RECORDING ──
+function startRecording() {
+  recSeconds = 0;
+  examDone = 0;
+  // reset checklist
+  for (let i = 0; i < 5; i++) {
+    const el = document.getElementById('chk' + i);
+    if (el) { el.className = 'check-icon pending'; el.textContent = ''; }
+  }
+  document.getElementById('stopBtn').disabled = true;
+
+  recInterval = setInterval(() => {
+    recSeconds++;
+    const m = String(Math.floor(recSeconds / 60)).padStart(2, '0');
+    const s = String(recSeconds % 60).padStart(2, '0');
+    document.getElementById('recTimer').textContent = m + ':' + s;
+
+    // Auto-check items
+    const checkpoints = [8, 16, 25, 35, 45];
+    for (let i = 0; i < checkpoints.length; i++) {
+      if (recSeconds === checkpoints[i]) {
+        const el = document.getElementById('chk' + i);
+        if (el) { el.className = 'check-icon done'; el.textContent = '✓'; }
+        examDone++;
+        if (examDone === 5) document.getElementById('stopBtn').disabled = false;
+      }
     }
-  });
-}, { threshold: 0.3 });
-bannerObserver.observe(document.getElementById('returnBanner'));
+  }, 1000);
+}
+
+function stopRecording() {
+  clearInterval(recInterval);
+  tecStep(3);
+}
+
+// ── ENVIAR EXPEDIENTE ──
+function enviarExpediente() {
+  expedienteEnviado = true;
+  tecStep(4);
+  showToast('📲 WhatsApp enviado al Dr. Andrés Rojas');
+}
+
+function resetTecnico() {
+  expedienteEnviado = false;
+  tecStep(0);
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── MÉDICO SCREENS ──
+function medScreen(screen) {
+  document.querySelectorAll('.phone-screen-inner').forEach(s => s.classList.remove('active'));
+  document.getElementById('med-screen-' + screen).classList.add('active');
+
+  if (screen === 'video') {
+    // mark video review done
+    const v = document.getElementById('med-chk-v');
+    if (v) { v.className = 'check-icon done'; v.textContent = '✓'; }
+  }
+  if (screen === 'llamada') {
+    startCall();
+    const c = document.getElementById('med-chk-c');
+    if (c) { c.className = 'check-icon done'; c.textContent = '✓'; }
+  }
+}
+
+// ── VIDEO PLAY ──
+function togglePlay() {
+  const btn = document.getElementById('playBtn');
+  if (playInterval) {
+    clearInterval(playInterval);
+    playInterval = null;
+    btn.textContent = '▶';
+  } else {
+    btn.textContent = '⏸';
+    playInterval = setInterval(() => {
+      playSeconds++;
+      const total = 258; // 4:18
+      const pct = Math.min((playSeconds / total) * 100, 100);
+      document.getElementById('vidProgress').style.width = pct + '%';
+      const m = Math.floor(playSeconds / 60);
+      const s = String(playSeconds % 60).padStart(2, '0');
+      document.getElementById('vidTime').textContent = m + ':' + s + ' / 4:18';
+      if (playSeconds >= total) {
+        clearInterval(playInterval); playInterval = null;
+        btn.textContent = '▶';
+      }
+    }, 1000);
+  }
+}
+
+// ── CALL ──
+function startCall() {
+  callSeconds = 0;
+  callInterval = setInterval(() => {
+    callSeconds++;
+    const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+    const s = String(callSeconds % 60).padStart(2, '0');
+    const el = document.getElementById('callTimer');
+    if (el) el.textContent = m + ':' + s;
+  }, 1000);
+}
+
+function colgarLlamada() {
+  clearInterval(callInterval);
+  medScreen('done');
+  const d = document.getElementById('med-chk-d');
+  if (d) { d.className = 'check-icon done'; d.textContent = '✓'; }
+  const el = document.getElementById('callTimer');
+  if (el) {
+    const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+    const s = String(callSeconds % 60).padStart(2, '0');
+    document.querySelector('#med-screen-done .resumen-dur') && (document.querySelector('#med-screen-done .resumen-dur').textContent = m + ':' + s);
+  }
+}
 </script>
 </body>
 </html>
